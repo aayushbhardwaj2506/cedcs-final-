@@ -114,8 +114,17 @@ def _send_smtp(actual: str, subject: str, text: str, html: str) -> None:
 
 
 def _check(resp) -> None:
-    if resp.status_code >= 300:
-        raise RuntimeError(f"HTTP {resp.status_code}: {resp.text[:160]}")
+    if resp.status_code < 300:
+        return
+    low = resp.text.lower()
+    hint = ""
+    if resp.status_code == 401:
+        hint = " -> the provider does not recognise the API key. Brevo needs an API key (starts with xkeysib-), not the SMTP key; check BREVO_API_KEY for spaces or a missing part."
+    elif resp.status_code == 403:
+        hint = " -> access denied: check the key's permissions and any IP restrictions on it."
+    elif resp.status_code == 400 and "sender" in low:
+        hint = " -> the sender address is not verified with the provider: verify MAIL_FROM there first."
+    raise RuntimeError(f"HTTP {resp.status_code}: {resp.text[:160].strip()}{hint}")
 
 
 def _send_brevo(actual: str, subject: str, text: str, html: str) -> None:

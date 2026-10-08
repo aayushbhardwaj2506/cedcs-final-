@@ -533,3 +533,14 @@ def test_test_mail_endpoint_is_admin_only_and_uses_the_current_setup(client, liv
     assert r["status"] == "SENT" and r["actual_to"] == "me@gmail.com" and r["mail"]["provider"] == "brevo" and ADMIN_H["X-Admin-Token"] not in str(r)
     monkeypatch.setenv("DISPATCH_MODE", "outbox")
     assert client.post("/admin/test-mail", json={"to_email": "me@gmail.com"}, headers=ADMIN_H).json()["status"] == "LOGGED"
+
+
+def test_provider_errors_come_with_a_plain_hint(monkeypatch):
+    monkeypatch.setenv("DISPATCH_MODE", "live")
+    monkeypatch.setenv("MAIL_FROM", "a@yours.test")
+    monkeypatch.setenv("MAIL_PROVIDER", "brevo")
+    monkeypatch.setenv("BREVO_API_KEY", "secret-brevo-key")
+    for code, body, expect in [(401, '{"message":"Key not found"}', "xkeysib-"), (400, '{"message":"Sender not valid"}', "verify MAIL_FROM"), (403, "{}", "permissions")]:
+        monkeypatch.setattr(mailer.requests, "post", lambda *a, _c=code, _b=body, **k: _FakeResp(_c, _b))
+        r = mailer.send({"to_email": "x@gmail.com", "subject": "s", "body_text": "t", "body_html": ""})
+        assert r["status"] == "FAILED" and expect in r["error"] and "secret-brevo-key" not in r["error"]
