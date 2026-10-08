@@ -17,8 +17,9 @@ services:
         generateValue: true
       - key: CEDCS_MODE
         value: auto
-      - key: DISPATCH_MODE
-        value: outbox             # alerts are logged, nothing is e-mailed
+      # E-mail is configured in the Render dashboard (Environment), not here, so a Blueprint sync never changes it:
+      #   DISPATCH_MODE=live  MAIL_PROVIDER=brevo  BREVO_API_KEY=...  MAIL_FROM=...  DISPATCH_TEST_INBOX=...
+      # Without DISPATCH_MODE alerts are only logged (a dry run). Render's free plan blocks outgoing SMTP, so use brevo or resend.
       - key: GROQ_API_KEY
         sync: false
       - key: NVIDIA_API_KEY

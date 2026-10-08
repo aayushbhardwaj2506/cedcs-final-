@@ -457,3 +457,79 @@ def test_pg_translate_makes_sqlite_sql_valid_for_postgres():
     assert "DOUBLE PRECISION" in store.pg_translate("CREATE TABLE IF NOT EXISTS acks(eta_min REAL)", "s")
     assert "s.hospital_reports" in store.pg_translate("INSERT INTO hospital_reports VALUES(?,?)", "s")
     assert store.pg_translate("SELECT '100%' AS x FROM settings", "s") == "SELECT '100%%' AS x FROM s.settings"
+
+
+# ------------------------------------------------------------------ e-mail providers over HTTPS (Brevo, Resend)
+class _FakeResp:
+    def __init__(self, code=201, text="ok"):
+        self.status_code, self.text = code, text
+
+
+@pytest.fixture
+def live_api(monkeypatch):
+    sent = []
+    monkeypatch.setenv("DISPATCH_MODE", "live")
+    monkeypatch.setenv("MAIL_FROM", "CEDCS Alerts <alerts@yours.test>")
+    monkeypatch.setattr(mailer.requests, "post", lambda url, json=None, headers=None, timeout=None: (sent.append((url, json, headers)), _FakeResp())[1])
+    monkeypatch.setattr(mailer.smtplib, "SMTP", lambda *a, **k: pytest.fail("SMTP must not be used for an HTTPS provider"))
+    return sent
+
+
+def test_brevo_sends_through_its_api_with_the_key_in_a_header_only(live_api, monkeypatch):
+    monkeypatch.setenv("MAIL_PROVIDER", "brevo")
+    monkeypatch.setenv("BREVO_API_KEY", "brevo-secret-key")
+    r = mailer.send({"to_email": "sister@gmail.com", "subject": "Alert", "body_text": "t", "body_html": "<b>t</b>"})
+    assert r["status"] == "SENT" and r["actual_to"] == "sister@gmail.com"
+    url, body, headers = live_api[0]
+    assert url == mailer.BREVO_URL and headers["api-key"] == "brevo-secret-key" and "brevo-secret-key" not in str(body)
+    assert body["to"] == [{"email": "sister@gmail.com"}] and body["sender"] == {"email": "alerts@yours.test", "name": "CEDCS Alerts"}
+    assert body["htmlContent"] == "<b>t</b>" and mailer.describe()["label"] == "LIVE via Brevo" and mailer.describe()["mode"] == "smtp"
+
+
+def test_resend_sends_through_its_api(live_api, monkeypatch):
+    monkeypatch.setenv("MAIL_PROVIDER", "resend")
+    monkeypatch.setenv("RESEND_API_KEY", "re-secret-key")
+    r = mailer.send({"to_email": "sister@gmail.com", "subject": "Alert", "body_text": "t", "body_html": ""})
+    url, body, headers = live_api[0]
+    assert r["status"] == "SENT" and url == mailer.RESEND_URL and headers["Authorization"] == "Bearer re-secret-key"
+    assert body["from"] == "CEDCS Alerts <alerts@yours.test>" and "html" not in body
+
+
+def test_sandbox_and_synthetic_rules_apply_to_the_https_providers_too(live_api, monkeypatch):
+    monkeypatch.setenv("MAIL_PROVIDER", "brevo")
+    monkeypatch.setenv("BREVO_API_KEY", "k")
+    r = mailer.send({"to_email": ambulances.hospital_email("H1"), "subject": "Alert", "body_text": "t", "body_html": ""})
+    assert r["status"] == "FAILED" and live_api == []  # a fictional hospital is refused before any network call
+    monkeypatch.setenv("DISPATCH_TEST_INBOX", "me@mine.test")
+    r = mailer.send({"to_email": ambulances.hospital_email("H1"), "subject": "Alert", "body_text": "t", "body_html": ""})
+    assert r["status"] == "SENT" and r["actual_to"] == "me@mine.test" and live_api[0][1]["to"] == [{"email": "me@mine.test"}]
+    assert live_api[0][1]["subject"].startswith("[SANDBOX for ") and "SANDBOX" in live_api[0][1]["textContent"]
+
+
+def test_provider_errors_are_reported_without_leaking_the_key(monkeypatch):
+    monkeypatch.setenv("DISPATCH_MODE", "live")
+    monkeypatch.setenv("MAIL_FROM", "a@yours.test")
+    monkeypatch.setenv("MAIL_PROVIDER", "brevo")
+    monkeypatch.setenv("BREVO_API_KEY", "brevo-secret-key")
+    monkeypatch.setattr(mailer.requests, "post", lambda *a, **k: _FakeResp(401, '{"message":"Key brevo-secret-key is invalid"}'))
+    r = mailer.send({"to_email": "x@gmail.com", "subject": "s", "body_text": "t", "body_html": ""})
+    assert r["status"] == "FAILED" and "401" in r["error"] and "brevo-secret-key" not in str(r) and "brevo-secret-key" not in str(mailer.describe())
+
+
+def test_unconfigured_provider_fails_clearly(monkeypatch):
+    monkeypatch.setenv("DISPATCH_MODE", "live")
+    monkeypatch.setenv("MAIL_PROVIDER", "brevo")
+    monkeypatch.delenv("BREVO_API_KEY", raising=False)
+    r = mailer.send({"to_email": "x@gmail.com", "subject": "s", "body_text": "t", "body_html": ""})
+    assert r["status"] == "FAILED" and "BREVO_API_KEY" in r["error"] and "not configured" in mailer.describe()["label"]
+
+
+def test_test_mail_endpoint_is_admin_only_and_uses_the_current_setup(client, live_api, monkeypatch):
+    monkeypatch.setenv("MAIL_PROVIDER", "brevo")
+    monkeypatch.setenv("BREVO_API_KEY", "k")
+    assert client.post("/admin/test-mail", json={"to_email": "me@gmail.com"}).status_code == 403
+    assert client.post("/admin/test-mail", json={"to_email": "nope"}, headers=ADMIN_H).status_code == 422
+    r = client.post("/admin/test-mail", json={"to_email": "me@gmail.com"}, headers=ADMIN_H).json()
+    assert r["status"] == "SENT" and r["actual_to"] == "me@gmail.com" and r["mail"]["provider"] == "brevo" and ADMIN_H["X-Admin-Token"] not in str(r)
+    monkeypatch.setenv("DISPATCH_MODE", "outbox")
+    assert client.post("/admin/test-mail", json={"to_email": "me@gmail.com"}, headers=ADMIN_H).json()["status"] == "LOGGED"

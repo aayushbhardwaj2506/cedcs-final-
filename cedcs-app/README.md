@@ -67,7 +67,9 @@ never treated as available, and older reports count for less.
 
 **Emergency dispatch** — after a recommendation, *Send emergency alerts* e-mails (with the patient's GPS location, map links and condition):
 family contacts, the best-ranked hospital, and the nearest ambulance. It needs explicit confirmation and happens once per case.
-* Default is a **dry run**: nothing is sent; every message is logged in the outbox. Set `DISPATCH_MODE=smtp` plus SMTP_* for real delivery.
+* Default is a **dry run**: nothing is sent; every message is logged in the outbox. Set `DISPATCH_MODE=live` for real delivery through
+  `MAIL_PROVIDER`: `smtp` (SMTP_*; blocked on hosts such as Render's free plan), `brevo` (`BREVO_API_KEY`, `MAIL_FROM`) or `resend`
+  (`RESEND_API_KEY`, `MAIL_FROM`). Use *Administrator settings > Send test email* to check the setup before a dispatch.
   `DISPATCH_TEST_INBOX` redirects *every* message to one inbox (recommended first). Synthetic hospital/ambulance addresses (example.org) are
   refused in live mode without it, and credentials never appear in logs, errors or API responses.
 * **Confirmation loop:** each hospital e-mail has Accept/Decline links to a confirmation page (opening a link changes nothing; only the

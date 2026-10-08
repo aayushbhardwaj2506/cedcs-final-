@@ -650,6 +650,26 @@ def dispatch_manual_ack(dispatch_id: str, body: ManualAck):
     return {**r, "dispatch": service.status(dispatch_id, tick=False)}
 
 
+class TestMailIn(BaseModel):
+    to_email: str
+
+
+@app.post("/admin/test-mail")
+def admin_test_mail(body: TestMailIn, x_admin_token: Optional[str] = Header(None)):
+    """Send one test message through the current mail settings, so the setup can be checked before a real dispatch (admin)."""
+    import re
+
+    require_admin(x_admin_token)
+    to = body.to_email.strip()
+    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", to):
+        raise HTTPException(status_code=422, detail="that email address is not valid")
+    res = mailer.send({"to_email": to, "subject": "CEDCS test email",
+                       "body_text": "This is a test message from CEDCS. If you can read it, e-mail delivery is set up correctly.",
+                       "body_html": "<p>This is a test message from <b>CEDCS</b>. If you can read it, e-mail delivery is set up correctly.</p>"})
+    history.event("test_mail", status=res["status"], mode=mailer.mode(), provider=mailer.provider())
+    return {**res, "mail": mailer.describe()}
+
+
 @app.get("/outbox")
 def outbox():
     return {"mail": mailer.describe(), "messages": store.list_outbox()}

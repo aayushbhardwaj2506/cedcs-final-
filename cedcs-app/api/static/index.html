@@ -267,6 +267,7 @@ dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);co
     <label class="toggle"><input type="checkbox" id="a_esc"> Escalate to the next hospital on decline / timeout</label>
     <label style="margin-top:8px">Hospital confirmation timeout (seconds)</label><input id="a_to" type="number" min="10" max="900">
     <div style="display:flex;gap:8px;align-items:center;margin-top:8px"><button type="button" class="btn ghost sm" id="adminApply">Save settings</button><span class="hint" id="adminMsg"></span></div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:8px"><input id="testMailTo" type="email" placeholder="your email, to test sending" aria-label="Address for a test email"><button type="button" class="btn ghost sm" id="testMail">Send test email</button></div><div class="hint" id="testMailMsg"></div>
   </details>
 </div></aside>
 
@@ -683,6 +684,11 @@ async function run(){clearInterval(dispTimer);DISP=null;CASE=null;$('dispatchCar
 async function bench(){$('bench').disabled=true;$('go').disabled=true;const t=[];try{for(let i=1;i<=10;i++){$('status').textContent=`benchmark ${i}/10…`;const t0=performance.now();const r=await fetch('/cases',{method:'POST',headers:{'content-type':'application/json'},body:body()});if(!r.ok)throw new Error('HTTP '+r.status);t.push(performance.now()-t0)}
  t.sort((a,b)=>a-b);$('status').textContent=`10 runs · browser round-trip median ${fmt(t[4])}, max ${fmt(t[9])}`}catch(e){$('status').textContent='Error: '+e.message}
  $('bench').disabled=false;$('go').disabled=false;loadStats()}
+$('testMail').onclick=async()=>{const to=$('testMailTo').value.trim(),m=$('testMailMsg');if(!to){m.textContent='Enter an address first.';return}
+ const t=($('adminTok').value||'').trim()||(()=>{try{return sessionStorage.getItem('cedcs_admin')||''}catch(e){return ''}})();if(!t){m.textContent='Enter the admin token above first.';return}
+ m.textContent='Sending…';const r=await fetch('/admin/test-mail',{method:'POST',headers:{'content-type':'application/json','X-Admin-Token':t},body:JSON.stringify({to_email:to})});const j=await r.json().catch(()=>({}));
+ if(!r.ok){m.textContent=r.status===403?'Wrong admin token.':(j.detail||'Could not send.');return}
+ m.textContent=j.status==='SENT'?`Sent to ${j.actual_to}. Check that inbox (and spam).`:j.status==='LOGGED'?'Dry run: nothing was sent. Set DISPATCH_MODE=live to send for real.':`Failed: ${j.error}`};
 const adminTok=()=>{const v=($('adminTok')?$('adminTok').value:'').trim();if(v)return v;let t='';try{t=sessionStorage.getItem('cedcs_admin')||''}catch(x){}return t};
 const fmtT=t=>new Date(t*1000).toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'});
 async function loadHistory(){const note=$('histNote'),list=$('histList');
