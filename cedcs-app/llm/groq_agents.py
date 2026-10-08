@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 import time
 from dataclasses import dataclass, field
@@ -504,6 +505,17 @@ CRITIC_SYSTEM = (
 )
 
 
+def _redact_diagnoses(text: str) -> tuple:
+    """(text, terms) with any condition name replaced by a neutral phrase. For ADVISORY notes only: the review's value is the
+    risk it points at, so one slipped-in condition name should not cost the whole review."""
+    from schemas.triage import find_diagnosis_terms
+
+    hits = find_diagnosis_terms(text)
+    for term in hits:
+        text = re.sub(r"(?i)\b" + re.escape(term) + r"\b", "a serious condition", text)
+    return text, hits
+
+
 def critic(case: StructuredCase, report_text: str, triage: TriageResult, rule_priority: str) -> tuple:
     info = CallInfo("CRITIC", model_for("CRITIC"), provider_for("CRITIC"))
     vocab = ", ".join(sorted(CAPABILITY_RESOURCE_MAP))
@@ -516,6 +528,8 @@ def critic(case: StructuredCase, report_text: str, triage: TriageResult, rule_pr
         '"additional_preferred_capabilities": [keys from the list below that would help and are missing], '
         '"needs_human_review": true|false (true if the case is ambiguous or high-stakes with poor data), '
         '"rationale": "one or two sentences, no diagnosis names"}\n\n'
+        "In every text field describe the observed signs and the risk. Never write a condition name or abbreviation "
+        "(for example MI, stroke, sepsis, heart attack): such text is rejected.\n"
         f"Capability keys allowed: {vocab}."
     )
 
@@ -523,6 +537,20 @@ def critic(case: StructuredCase, report_text: str, triage: TriageResult, rule_pr
         d["additional_preferred_capabilities"] = [
             c for c in d.get("additional_preferred_capabilities", []) if c in CAPABILITY_RESOURCE_MAP
         ]
+        removed: list = []
+        for key in ("concerns", "contradictions"):
+            if isinstance(d.get(key), list):
+                cleaned = []
+                for item in d[key]:
+                    text, hits = _redact_diagnoses(item) if isinstance(item, str) else (item, [])
+                    removed += hits
+                    cleaned.append(text)
+                d[key] = cleaned
+        if isinstance(d.get("rationale"), str):
+            d["rationale"], hits = _redact_diagnoses(d["rationale"])
+            removed += hits
+        if removed:
+            info.extra["redacted_terms"] = sorted(set(removed))  # shown in the run details: the notes were edited, not rejected
         return d
 
     from schemas.agents import CriticReview

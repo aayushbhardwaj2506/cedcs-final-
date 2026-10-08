@@ -273,3 +273,24 @@ def test_advisor_preferring_the_current_leader_adds_no_score(monkeypatch, groq):
     assert o.trace["advisor"]["adjustments"] == {} and not o.trace["advisor"]["changed_top"]
     assert rec.primary.hospital_id == leader
     assert not any(s["stage"] == "RE_RANK" for s in o.audit.spans)  # nothing to re-rank
+
+
+# ---------------- a condition name in the critic's notes is removed, not a reason to lose the whole review
+def test_critic_review_survives_a_condition_name_in_its_notes(groq, monkeypatch):
+    payload = json.dumps({"concerns": ["Possible MI given chest pain; stroke cannot be excluded"], "contradictions": [],
+                          "suggested_priority": "CRITICAL", "additional_preferred_capabilities": ["ICU", "NOT_A_KEY"],
+                          "needs_human_review": False, "rationale": "Sudden collapse with chest pain suggests a heart attack."})
+    calls = []
+    monkeypatch.setattr(groq_agents, "_chat", lambda *a, **k: (calls.append(1), payload)[1])
+    case = rule_based.parse_intake(dict(RAW))
+    review, info = groq_agents.critic(case, RAW["emergency_report"], rule_based.assess_triage(case), "HIGH")
+    assert len(calls) == 1  # accepted first time: no second model call
+    text = " ".join(review.concerns) + " " + review.rationale
+    assert "MI" not in text and "stroke" not in text and "heart attack" not in text and "a serious condition" in text
+    assert review.suggested_priority == "CRITICAL" and review.additional_preferred_capabilities == ["ICU"]
+    assert set(info.extra["redacted_terms"]) == {"heart attack", "mi", "stroke"}
+
+
+def test_redaction_leaves_ordinary_words_alone():
+    text, hits = groq_agents._redact_diagnoses("imminent deterioration within minutes, administer oxygen")
+    assert hits == [] and text == "imminent deterioration within minutes, administer oxygen"
