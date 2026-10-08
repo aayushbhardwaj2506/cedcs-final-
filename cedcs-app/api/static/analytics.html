@@ -58,7 +58,7 @@ const when=t=>new Date(t*1000).toLocaleString([], {day:'2-digit',month:'short',h
 const PRI={CRITICAL:'--bad',HIGH:'--warn',MODERATE:'--accent',LOW:'--ok'};
 const PROV={groq:'--accent',nvidia:'--core',fallback:'--warn'};
 let D=null;
-function tok(){try{return sessionStorage.getItem('cedcs_admin')||$('tok').value}catch(e){return $('tok').value}}
+function tok(){const v=($('tok').value||'').trim();if(v)return v;try{return sessionStorage.getItem('cedcs_admin')||''}catch(e){return ''}}
 try{const t=sessionStorage.getItem('cedcs_admin');if(t)$('tok').value=t}catch(e){}
 
 /* ---------- small chart helpers (inline SVG, no libraries) ---------- */
