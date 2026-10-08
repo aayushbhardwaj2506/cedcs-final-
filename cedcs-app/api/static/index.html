@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEDCS Command View</title>
+<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+<style>
+:root{color-scheme:light;
+ --bg:#f4f6fb;--card:#ffffff;--card2:#f8faff;--ink:#0f172a;--mute:#5b6785;--line:#e2e8f3;--barbg:#eaeff8;
+ --accent:#2563eb;--accent2:#4f46e5;--accent-soft:#e8f0ff;
+ --ok:#0f9d6b;--warn:#d97706;--bad:#e11d48;--ai:#7c3aed;--core:#0d9488;--guard:#d97706;
+ --shadow:0 1px 2px rgba(15,23,42,.05),0 8px 24px rgba(37,99,235,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;
+ --bg:#0a0e17;--card:#111827;--card2:#151d2f;--ink:#e6ebf5;--mute:#8a96b0;--line:#222c42;--barbg:#1a2338;
+ --accent:#5b9bff;--accent2:#8b8cff;--accent-soft:#16233f;
+ --ok:#34d399;--warn:#fbbf24;--bad:#fb7185;--ai:#b39cff;--core:#2dd4bf;--guard:#fbbf24;
+ --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.25)}}
+:root[data-theme=dark]{color-scheme:dark;
+ --bg:#0a0e17;--card:#111827;--card2:#151d2f;--ink:#e6ebf5;--mute:#8a96b0;--line:#222c42;--barbg:#1a2338;
+ --accent:#5b9bff;--accent2:#8b8cff;--accent-soft:#16233f;
+ --ok:#34d399;--warn:#fbbf24;--bad:#fb7185;--ai:#b39cff;--core:#2dd4bf;--guard:#fbbf24;
+ --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.25)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 20px;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--core));display:grid;place-items:center;color:#fff;font-weight:800}
+.top h1{font-size:16px;margin:0}.top .sp{flex:1}.sub{color:var(--mute);font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12px;white-space:nowrap}
+.chip.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--warn)}.chip.ok::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;max-width:1500px;margin:0 auto;padding:16px 20px 60px}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.side{position:static!important}}
+.side{position:sticky;top:64px;align-self:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card>h2,.h2{font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;font-weight:600;display:flex;align-items:center;gap:8px}
+.h2 .r{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:400}
+label,.lab{display:block;font-size:12px;color:var(--mute);margin:12px 0 4px}
+textarea,input[type=text],input:not([type]),select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+textarea{resize:vertical}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.seg button{flex:1;padding:5px 2px;background:transparent;border:0;border-right:1px solid var(--line);cursor:pointer;font-size:12px;color:var(--mute)}
+.seg button:last-child{border-right:0}.seg button.on{background:var(--accent);color:#fff}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:600}.btn:disabled{opacity:.55;cursor:progress}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line);font-weight:500}.btn.sm{padding:3px 10px;font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer}.chips button:hover{border-color:var(--accent)}
+[hidden]{display:none!important}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hint{font-size:11.5px;color:var(--mute)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mute);margin-top:10px}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);min-height:86px}
+.kpi.wide{grid-column:span 2}@media(max-width:600px){.kpi.wide{grid-column:auto}}
+.kpi .k{font-size:11.5px;color:var(--mute);text-transform:uppercase;letter-spacing:.03em}.kpi .v{font-size:19px;font-weight:700;line-height:1.25;margin-top:2px}.kpi .s{font-size:12px;color:var(--mute)}
+.kpi.empty .v{color:var(--mute);font-weight:500;font-size:15px}
+.ring{display:flex;align-items:center;gap:12px}.ring svg{flex:none}
+.badge{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid currentColor}
+.HIGH,.PRESENT,.ELIGIBLE,.CRITICAL-no{color:var(--ok)}.MODERATE,.PROVISIONAL,.UNKNOWN{color:var(--warn)}.LOW,.ABSENT,.REJECTED{color:var(--bad)}
+.P-CRITICAL{color:var(--bad)}.P-HIGH{color:var(--warn)}.P-MODERATE{color:var(--accent)}.P-LOW{color:var(--ok)}
+.alert{border:1px solid color-mix(in srgb,var(--bad) 45%,var(--line));border-left:5px solid var(--bad);padding:10px 14px;background:color-mix(in srgb,var(--bad) 7%,var(--card));border-radius:10px;margin-bottom:14px}
+.alert.warn{border-color:color-mix(in srgb,var(--warn) 50%,var(--line));border-left-color:var(--warn);background:color-mix(in srgb,var(--warn) 8%,var(--card))}
+/* flow */
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin:-2px 0 10px}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.flow{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.node{position:relative;border:1.5px solid var(--line);border-top:4px solid var(--line);border-radius:10px;padding:6px 9px 7px;background:var(--bg);cursor:pointer;opacity:.5;transition:opacity .2s,border-color .2s;text-align:left}
+.node.ai{border-top-color:var(--ai)}.node.core{border-top-color:var(--core)}.node.guard{border-top-color:var(--guard)}
+.node .n{position:absolute;right:7px;top:4px;font-size:10px;color:var(--mute)}
+.node b{display:block;font-size:12.5px}.node .ms{font:12px ui-monospace,Consolas,monospace;color:var(--mute)}
+.node .share{height:3px;background:var(--barbg);border-radius:2px;margin-top:5px;overflow:hidden}.node .share i{display:block;height:100%;background:var(--accent);width:0}
+.node.done{opacity:1}.node.running{opacity:1;border-color:var(--accent);animation:pulse 1s infinite}.node.halted{opacity:1;border-color:var(--bad)}
+.node.hl{opacity:1;background:var(--accent-soft)}.node.sel{outline:2px solid var(--accent);outline-offset:1px}.node.slow .ms{color:var(--warn);font-weight:700}
+@keyframes pulse{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 18%,transparent)}}
+@media(prefers-reduced-motion:reduce){.node.running{animation:none}html{scroll-behavior:auto}}
+/* waterfall */
+.wfrow{display:grid;grid-template-columns:minmax(96px,150px) 1fr 64px 52px;gap:8px;align-items:center;padding:3px 4px;border-radius:6px;font-size:12.5px}
+.wfrow:hover,.wfrow.hl{background:var(--accent-soft)}.wfrow.head{color:var(--mute);font-size:11.5px}.wfrow.head:hover{background:none}
+.wfbar{position:relative;height:14px;background:var(--barbg);border-radius:4px}.wfbar i{position:absolute;top:0;height:100%;border-radius:4px;min-width:3px}
+.wfaxis{position:relative;height:14px;font-size:10.5px;color:var(--mute)}.wfaxis span{position:absolute;transform:translateX(-50%)}.wfaxis span:first-child{transform:none}.wfaxis span:last-child{transform:translateX(-100%)}
+.num{text-align:right;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.ai-c{background:var(--ai)}.core-c{background:var(--core)}.guard-c{background:var(--guard)}.par-c{background:var(--mute);opacity:.4}
+.summary{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mute)}.summary b{color:var(--ink)}
+.two{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px}@media(max-width:1180px){.two{grid-template-columns:1fr}}
+/* detail */
+.kv{display:grid;grid-template-columns:minmax(90px,150px) 1fr;gap:6px 12px}.kv>span:nth-child(odd){color:var(--mute)}
+.tag{display:inline-block;padding:1px 8px;margin:1px 4px 1px 0;border-radius:999px;border:1px solid var(--line);font-size:12px}
+.bar{height:10px;border-radius:4px;background:var(--barbg);overflow:hidden;display:flex}.bar i{display:block;height:100%}
+.pct{display:inline-flex;align-items:center;gap:6px}.pct .bar{width:110px}
+.scroll{max-height:330px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:4px 6px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mute);font-weight:500;position:sticky;top:0;background:var(--card)}
+pre{white-space:pre-wrap;font:12.5px/1.55 ui-monospace,Consolas,monospace;margin:0}
+.desc{color:var(--mute);font-size:12.5px;margin:0 0 10px;padding:8px 10px;background:var(--bg);border-radius:8px}
+/* hospital rows */
+.h{display:grid;grid-template-columns:28px 1fr auto;gap:10px;padding:8px 6px;border-top:1px solid var(--line);border-radius:8px;cursor:default}.h:first-of-type{border-top:0}.h:hover,.h.hl{background:var(--accent-soft)}
+.rk{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:12px;display:grid;place-items:center}.rk.x{background:var(--barbg);color:var(--mute)}
+.map svg text{fill:var(--ink);font-size:10px}.map circle{transition:r .15s}
+.empty{padding:26px 10px;text-align:center;color:var(--mute)}
+.skel{height:14px;border-radius:6px;background:linear-gradient(90deg,var(--barbg),var(--line),var(--barbg));background-size:200% 100%;animation:sk 1.2s infinite}@keyframes sk{to{background-position:-200% 0}}
+
+/* orchestration map */
+.omap{width:100%;display:block;background:var(--barbg);border-radius:12px}
+.omap .edge{stroke:var(--mute);stroke-opacity:.45;stroke-width:1.5;fill:none}.omap .edge.active{stroke:var(--accent);stroke-width:3}
+.omap .nd rect{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+.omap .nd.working rect{stroke:var(--accent);stroke-width:2.5;animation:glow 1s infinite}.omap .nd.done rect{stroke:var(--ok);stroke-width:2}
+.omap .nd.error rect{stroke:var(--bad);stroke-width:2}.omap .nd.skip rect{stroke-dasharray:5 4;opacity:.65}
+.omap .nd.idle{opacity:.6}.omap .nd .bar-lane{stroke:none}
+@keyframes glow{50%{stroke-opacity:.35}}
+.omap text{fill:var(--ink);font-size:13px;font-weight:600;pointer-events:none}.omap .sub{fill:var(--mute);font-size:10.5px;font-weight:400}
+.omap .res{fill:var(--mute);font-size:10.5px;font-weight:400}.omap .mdl{fill:var(--accent);font-size:10px;font-weight:500}
+.omap .hub rect{fill:var(--accent);stroke:none}.omap .hub text{fill:#fff}.omap .hub .sub{fill:#dbe6ff}
+.mlog{font:11.5px/1.55 ui-monospace,Consolas,monospace;max-height:190px;overflow:auto;padding:6px 8px;background:var(--bg);border-radius:8px;margin-top:8px}
+.mlog .k-command{color:var(--accent)}.mlog .k-result{color:var(--ok)}.mlog .k-error{color:var(--bad)}.mlog .k-skip{color:var(--mute)}.mlog .t{color:var(--mute)}
+.plan{margin-top:8px;font-size:12.5px}.plan div{padding:2px 0}
+@media(prefers-reduced-motion:reduce){.omap .nd.working rect{animation:none}}
+
+/* ===== colour refresh ===== */
+::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+body{background:
+  radial-gradient(900px 420px at 8% -8%,color-mix(in srgb,var(--ai) 10%,transparent),transparent 60%),
+  radial-gradient(800px 420px at 100% 0%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 60%),
+  radial-gradient(700px 500px at 50% 110%,color-mix(in srgb,var(--core) 7%,transparent),transparent 60%),var(--bg);background-attachment:fixed}
+.top{position:sticky;background:color-mix(in srgb,var(--card) 82%,transparent);backdrop-filter:blur(12px) saturate(1.4)}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:linear-gradient(90deg,var(--ai),var(--accent),var(--core),var(--ok))}
+.logo{background:linear-gradient(135deg,var(--ai),var(--accent) 55%,var(--core));box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 40%,transparent)}
+.card{background:linear-gradient(180deg,var(--card),color-mix(in srgb,var(--card) 92%,var(--card2)));border-color:var(--line)}
+.card>h2,.h2{color:color-mix(in srgb,var(--mute) 80%,var(--ink))}
+.card>h2::before{content:"";width:8px;height:8px;border-radius:3px;background:linear-gradient(135deg,var(--accent),var(--accent2));flex:none}
+/* buttons + inputs */
+.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 2px 10px color-mix(in srgb,var(--accent) 35%,transparent);color:#fff}
+.btn:hover:not(:disabled){filter:brightness(1.08)}.btn:disabled{box-shadow:none}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,var(--line))}
+.btn.ghost:hover:not(:disabled){background:var(--accent-soft)}
+textarea,input[type=text],input:not([type]),select{background:var(--card2);border-color:var(--line)}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.seg{background:var(--card2)}.seg button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.chips button{background:var(--card2)}.chips button:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.chip{background:var(--card2)}.chip.ok{border-color:color-mix(in srgb,var(--ok) 45%,var(--line));color:var(--ok)}.chip.live{border-color:color-mix(in srgb,var(--warn) 45%,var(--line));color:var(--warn)}
+/* badges and tags: tinted, not just outlined */
+.badge{background:color-mix(in srgb,currentColor 13%,transparent);border-color:color-mix(in srgb,currentColor 45%,transparent)}
+.tag{background:color-mix(in srgb,var(--accent) 7%,var(--card2));border-color:color-mix(in srgb,var(--accent) 18%,var(--line))}
+/* semantic colours */
+.P-CRITICAL{color:var(--bad)}.P-HIGH{color:var(--warn)}.P-MODERATE{color:var(--accent)}.P-LOW{color:var(--ok)}
+.alert{background:linear-gradient(90deg,color-mix(in srgb,var(--bad) 12%,var(--card)),var(--card))}
+.alert.warn{background:linear-gradient(90deg,color-mix(in srgb,var(--warn) 13%,var(--card)),var(--card))}
+/* KPI tiles: a coloured top edge and a faint wash of the tile's meaning */
+.kpi{border-top:3px solid var(--tone,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--tone,var(--card)) 9%,var(--card)),var(--card) 70%)}
+.kpi .k{color:color-mix(in srgb,var(--tone,var(--mute)) 55%,var(--mute))}
+/* workflow steps: lane-tinted once they have run */
+.node{background:var(--card2)}
+.node.ai{border-top-color:var(--ai)}.node.core{border-top-color:var(--core)}.node.guard{border-top-color:var(--guard)}
+.node.done.ai{background:linear-gradient(180deg,color-mix(in srgb,var(--ai) 11%,var(--card2)),var(--card2))}
+.node.done.core{background:linear-gradient(180deg,color-mix(in srgb,var(--core) 11%,var(--card2)),var(--card2))}
+.node.done.guard{background:linear-gradient(180deg,color-mix(in srgb,var(--guard) 11%,var(--card2)),var(--card2))}
+.node.running{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.node .share i{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+/* waterfall bars use the same lane colours, with a soft gradient */
+.ai-c{background:linear-gradient(90deg,var(--ai),color-mix(in srgb,var(--ai) 65%,#fff))}
+.core-c{background:linear-gradient(90deg,var(--core),color-mix(in srgb,var(--core) 65%,#fff))}
+.guard-c{background:linear-gradient(90deg,var(--guard),color-mix(in srgb,var(--guard) 65%,#fff))}
+.wfbar{background:color-mix(in srgb,var(--barbg) 85%,transparent)}
+.wfrow:hover,.wfrow.hl{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+/* orchestration map */
+.omap{background:radial-gradient(color-mix(in srgb,var(--mute) 28%,transparent) 1px,transparent 1px) 0 0/20px 20px,
+  radial-gradient(60% 70% at 50% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent),var(--barbg)}
+.omap .edge{stroke:color-mix(in srgb,var(--mute) 55%,transparent);stroke-opacity:1;stroke-width:1.3;stroke-dasharray:2 4}
+.omap .edge.active{stroke:var(--accent);stroke-dasharray:none;stroke-width:2.8;filter:drop-shadow(0 0 4px var(--accent))}
+.omap .nd rect{fill:var(--card)}
+.omap .nd.working rect{stroke:var(--lc,var(--accent))}
+.omap .nd.working{filter:drop-shadow(0 0 7px var(--lc,var(--accent)))}
+.omap .nd.done rect{stroke:var(--ok)}.omap .nd.done{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--ok) 45%,transparent))}
+.omap .nd.error rect{stroke:var(--bad)}
+.omap .hub rect{fill:url(#hubgrad);stroke:none}
+.omap #pk circle{filter:drop-shadow(0 0 5px currentColor)}
+.mlog{background:var(--card2);border:1px solid var(--line)}
+.plan b{color:var(--accent)}
+/* detail panels */
+.desc{background:var(--card2);border:1px solid var(--line)}
+.h{border-color:var(--line)}.h:hover,.h.hl{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.rk{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 35%,transparent)}
+.rk.x{background:var(--barbg);box-shadow:none}
+th{background:var(--card)}
+/* nicer scrollbars */
+*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--mute) 45%,transparent) transparent}
+/* theme switch */
+#theme{min-width:74px}
+
+/* ===== live map ===== */
+.two.widemap{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}@media(max-width:1180px){.two.widemap{grid-template-columns:1fr}}
+#lmap{height:460px;border-radius:12px;border:1px solid var(--line);z-index:0}
+.leaflet-container{font:inherit;background:var(--barbg)}
+.leaflet-popup-content-wrapper,.leaflet-tooltip{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:10px}
+.leaflet-popup-tip,.leaflet-tooltip-top:before,.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{background:var(--card);border-top-color:var(--card);border-bottom-color:var(--card);border-left-color:var(--card);border-right-color:var(--card)}
+.leaflet-container a.leaflet-popup-close-button{color:var(--mute)}
+.leaflet-bar a{background:var(--card);color:var(--ink);border-color:var(--line)}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--card) 82%,transparent)!important;color:var(--mute)!important;font-size:10px}
+.leaflet-control-attribution a{color:var(--accent)!important}
+.hm{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 12px system-ui;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4);background:var(--ok);transition:transform .15s}
+.hm.PROVISIONAL{background:var(--warn)}
+.hm.REJECTED{background:var(--bad);opacity:.6;width:14px;height:14px;border-width:1.5px;font-size:0}
+.hm.top{width:36px;height:36px;font-size:15px;box-shadow:0 0 0 5px color-mix(in srgb,var(--ok) 38%,transparent),0 3px 12px rgba(0,0,0,.45)}
+.hm.hl{transform:scale(1.4)}
+.pm{position:relative;width:24px;height:24px}
+.pm i{position:absolute;inset:3px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.45);animation:ping 1.8s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 65%,transparent),0 2px 8px rgba(0,0,0,.45)}70%{box-shadow:0 0 0 16px transparent,0 2px 8px rgba(0,0,0,.45)}100%{box-shadow:0 0 0 0 transparent,0 2px 8px rgba(0,0,0,.45)}}
+@media(prefers-reduced-motion:reduce){.pm i{animation:none}}
+.lgd{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--mute)}.lgd i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.lgd u{display:inline-block;width:18px;height:4px;border-radius:2px;margin-right:5px;vertical-align:2px;text-decoration:none}
+
+/* ===== live search visual ===== */
+@keyframes pop{0%{transform:scale(0);opacity:0}65%{transform:scale(1.3);opacity:1}100%{transform:scale(1)}}
+.hm.rev{animation:pop .5s cubic-bezier(.2,.9,.3,1.2) backwards}
+.hm.FOUND{background:var(--accent);width:17px;height:17px;font-size:0;border-width:2px}
+.hm.FOUND.dv{background:var(--warn)}
+.mapstat{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:1000;display:flex;gap:8px;align-items:center;max-width:88%;padding:6px 14px;border-radius:999px;
+  background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:var(--shadow);font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.mapstat .sd{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none;animation:blink 1s infinite}
+.mapstat.ok .sd{background:var(--ok);animation:none}.mapstat.warn .sd{background:var(--warn)}.mapstat.bad .sd{background:var(--bad);animation:none}
+@keyframes blink{50%{opacity:.25}}
+#gps.loading{opacity:.7}
+
+/* ===== bed checker, contacts, dispatch ===== */
+.side{max-height:calc(100vh - 80px);overflow:auto;padding-right:2px}
+.bt{width:100%;border-collapse:collapse;font-size:12.5px}.bt td.b{text-align:center;font-family:ui-monospace,Consolas,monospace;border-radius:6px}
+.b0{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}.b1{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.b3{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}.bq{color:var(--mute)}.bt th.rel{color:var(--accent);border-bottom:2px solid var(--accent)}
+.st-NO_ADDRESS{color:var(--warn)}.st-SENT,.st-CONFIRMED,.st-ACCEPTED{color:var(--ok)}.st-LOGGED{color:var(--accent)}.st-FAILED,.st-DECLINED,.st-NO_MORE_HOSPITALS{color:var(--bad)}.st-QUEUED,.st-AWAITING_CONFIRMATION,.st-AWAITING_NEXT{color:var(--warn)}
+.banner{display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:10px;border:1px solid var(--line);margin-bottom:10px;background:var(--card2)}
+.banner.ok{border-color:color-mix(in srgb,var(--ok) 45%,var(--line));background:color-mix(in srgb,var(--ok) 10%,var(--card))}
+.banner.warn{border-color:color-mix(in srgb,var(--warn) 45%,var(--line));background:color-mix(in srgb,var(--warn) 10%,var(--card))}
+.banner.bad{border-color:color-mix(in srgb,var(--bad) 45%,var(--line));background:color-mix(in srgb,var(--bad) 10%,var(--card))}
+.mrow{display:grid;grid-template-columns:86px minmax(0,1.2fr) 92px minmax(0,1.4fr);gap:8px;align-items:start;padding:8px 4px;border-top:1px solid var(--line);font-size:12.5px}
+.mrow:first-of-type{border-top:0}.report{font-size:14px;line-height:1.6}.report p{margin:.4em 0}.report ul{margin:.3em 0 .6em 1.1em;padding:0}.report .rh{font-weight:700;margin-top:.8em}
+.pv{white-space:pre-wrap;font:12px/1.5 ui-monospace,Consolas,monospace;background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:8px;max-height:230px;overflow:auto;margin:6px 0 0}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.4)}dialog::backdrop{background:rgba(5,8,16,.6);backdrop-filter:blur(3px)}
+.contact{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid var(--line);font-size:12.5px}.contact:first-child{border-top:0}.contact b{font-weight:600}.contact .x{margin-left:auto;cursor:pointer;color:var(--bad);background:none;border:0}
+.dbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+</style></head><body>
+<div class="top"><div class="logo">C</div><div><h1>CEDCS Command View</h1><div class="sub">Emergency hospital routing · <span id="subSrc">loading hospital data…</span> · prototype, not for real emergencies</div></div><div class="sp"></div>
+ <span class="chip" id="srcChip" title="Where the hospitals on the map come from">🏥 …</span><span class="chip" id="modeChip">mode: —</span><span class="chip" id="totalChip">no run yet</span><a class="btn ghost sm" href="/analytics" title="Saved runs, latency and research data">Analytics</a><button class="btn ghost sm" id="theme" type="button" title="Switch between automatic, light and dark theme">◐ Auto</button><button class="btn ghost sm" id="export" disabled title="Download the full run (timeline, reasoning, recommendation) as JSON">Export run</button></div>
+
+<div class="layout">
+<aside class="side"><form id="f" class="card" autocomplete="off">
+  <h2>New case</h2>
+  <label for="report" style="margin-top:0">What was reported?</label>
+  <textarea id="report" rows="3" placeholder="e.g. 60 year old male, sudden collapse, confused, chest pain"></textarea>
+  <div class="chips" id="examples"></div>
+  <div class="lab">Consciousness</div><div class="seg" data-key="c"></div>
+  <div class="lab">Breathing</div><div class="seg" data-key="b"></div>
+  <div class="lab">Bleeding</div><div class="seg" data-key="bl"></div>
+  <label for="loc">Patient location</label>
+  <button type="button" class="btn ghost sm" id="gps" style="width:100%;margin-bottom:6px;padding:7px">📍 Use my current location</button>
+  <input id="q" placeholder="Search an address or place…" autocomplete="off" style="margin-bottom:6px"><div id="qres" class="chips" style="flex-direction:column;align-items:stretch;margin:0 0 6px"></div>
+  <select id="loc"></select><div class="hint" id="locInfo" style="margin-top:6px"></div>
+  <div class="row2" id="custom" hidden style="margin-top:8px"><input id="lat" placeholder="latitude"><input id="lng" placeholder="longitude"></div>
+  <label class="toggle" id="bedRow" title="Scans nearby hospitals for live bed availability and makes it the largest ranking metric. Off unless you switch it on."><input type="checkbox" id="bedcheck"> 🛏 Bed checker <span class="hint" id="bedHint"></span></label>
+  <div style="display:flex;gap:8px;margin-top:14px"><button class="btn" id="go" style="flex:1">Run pipeline</button><button type="button" class="btn ghost" id="bench" title="Run 10 times to measure latency">×10</button></div>
+  <label class="toggle"><input type="checkbox" id="slow"> Slow motion (0.4 s per event)</label>
+  <div class="hint" id="status" role="status" aria-live="polite" style="margin-top:8px">Ctrl+Enter to run</div>
+</form>
+<div class="card" id="autoCard"><h2>Emergency contacts &amp; automation</h2>
+  <div class="hint" style="margin-bottom:6px">Family members who are e-mailed the patient's GPS location and condition when alerts are sent.</div>
+  <div id="contacts"></div>
+  <div class="row2" style="margin-top:8px"><input id="c_name" placeholder="Name"><input id="c_email" placeholder="Email" type="email"></div>
+  <div class="row2" style="margin-top:6px"><input id="c_rel" placeholder="Relationship"><button type="button" class="btn ghost sm" id="c_add">Add contact</button></div>
+  <div class="hint" id="c_msg" style="margin-top:4px"></div>
+  <div style="margin-top:10px"><span class="badge" id="mailMode">…</span></div>
+  <details style="margin-top:10px"><summary class="hint" style="cursor:pointer">Administrator settings</summary>
+    <div class="hint" style="margin:6px 0">The admin token is printed in the server console at startup (or set ADMIN_TOKEN).</div>
+    <input id="adminTok" type="password" placeholder="Admin token" autocomplete="off">
+    <label style="margin-top:8px">Hospital data source</label><select id="a_src"><option value="real">Real hospitals (OpenStreetMap)</option><option value="synthetic">Synthetic demo network</option></select>
+    <label class="toggle"><input type="checkbox" id="a_bed"> Bed checker on for everyone</label>
+    <label class="toggle"><input type="checkbox" id="a_user"> Let users switch the bed checker on themselves</label>
+    <label class="toggle"><input type="checkbox" id="a_auto"> Auto-dispatch alerts for CRITICAL / HIGH cases</label>
+    <label class="toggle"><input type="checkbox" id="a_esc"> Escalate to the next hospital on decline / timeout</label>
+    <label style="margin-top:8px">Hospital confirmation timeout (seconds)</label><input id="a_to" type="number" min="10" max="900">
+    <div style="display:flex;gap:8px;align-items:center;margin-top:8px"><button type="button" class="btn ghost sm" id="adminApply">Save settings</button><span class="hint" id="adminMsg"></span></div>
+  </details>
+</div></aside>
+
+<section>
+  <div id="alerts"></div>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card"><h2>Orchestration <span class="r"><button type="button" class="btn ghost sm" id="replay" disabled>▶ Replay</button></span></h2>
+    <svg id="omap" class="omap" viewBox="0 0 960 450" role="img" aria-label="Live diagram of the orchestrator sending commands to agents and services"></svg>
+    <div class="legend" style="margin:8px 0 0"><span><i class="dot" style="background:var(--accent)"></i>command</span><span><i class="dot" style="background:var(--ok)"></i>result</span><span><i class="dot" style="background:var(--bad)"></i>failure / fallback</span><span><i class="dot" style="background:var(--mute)"></i>skipped by the orchestrator</span></div>
+    <div class="plan" id="plan"></div><div class="mlog" id="mlog">Messages appear here as the orchestrator dispatches work.</div></div>
+
+  <div class="card"><h2>Workflow <span class="r hint" id="flowHint">click a step to inspect it</span></h2>
+    <div class="legend"><span><i class="dot" style="background:var(--ai)"></i>AI layer — interprets, never decides</span><span><i class="dot" style="background:var(--core)"></i>Deterministic core — decides</span><span><i class="dot" style="background:var(--guard)"></i>Guardrails — can only escalate or block</span></div>
+    <div class="flow" id="flow"></div></div>
+
+  <div class="two">
+    <div class="card"><h2>Latency waterfall <span class="r" id="wfNote"></span></h2><div id="wf"><div class="empty">Run a case to see where the time goes.</div></div></div>
+    <div class="card"><h2 id="detTitle">Step detail</h2><div id="det"><div class="empty">Run a case, then click any step. The view follows the pipeline live until you pick one.</div></div></div>
+  </div>
+
+  <div class="two widemap">
+    <div class="card"><h2>Recommendation</h2><div id="reco"><div class="empty">—</div></div></div>
+    <div class="card" id="reportCard" hidden><h2>Written report <span class="r"><span class="badge" id="repSrc"></span> <button class="btn ghost sm" id="repCopy" type="button">Copy</button></span></h2><div id="reportBody" class="report"></div></div>
+    <div class="card"><h2>Live map <span class="r"><label class="toggle" style="margin:0;font-size:12px"><input type="checkbox" id="showRej" checked> show excluded</label></span></h2><div id="map" class="map"><div class="empty">—</div></div></div>
+  </div>
+
+  <div class="card" id="provCard"><h2>AI providers <span class="r"><button type="button" class="btn ghost sm" id="provRefresh">refresh</button></span></h2><div id="prov" class="hint">loading…</div></div>
+
+  <div class="card" id="bedCard" hidden><h2>Bed availability <span class="r hint" id="bedMeta"></span></h2><div id="beds"></div></div>
+
+  <div class="card" id="dispatchCard" hidden><h2>Emergency dispatch <span class="r"><span class="badge" id="dispMode"></span></span></h2><div id="disp"></div></div>
+
+  <div class="card" id="histCard"><h2>Saved history <span class="r"><span class="badge" id="histWhere"></span> <button type="button" class="btn ghost sm" id="histRefresh">refresh</button></span></h2><div class="hint" id="histNote">Every run is saved with its full report and timings. Enter the admin token to view them.</div><div id="histList" class="scroll" style="max-height:260px"></div><div id="histEv" class="hint"></div></div>
+  <div class="card"><h2>Latency across runs <span class="r"><button type="button" class="btn ghost sm" id="reset">reset</button></span></h2><div id="stats" class="hint">—</div></div>
+</section></div>
+
+<dialog id="confirmDlg"><form method="dialog" id="confirmForm"><h3 style="margin:0 0 8px">Send emergency alerts?</h3><div id="confirmBody"></div>
+  <label class="toggle" id="confirmLiveRow" hidden><input type="checkbox" id="confirmLive"> I understand these are REAL e-mails to real people</label>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button value="cancel" class="btn ghost sm">Cancel</button><button value="send" class="btn sm" id="confirmSend">Send alerts</button></div></form></dialog>
+<script src="/static/vendor/leaflet/leaflet.js"></script>
+<script>
+function showMode(d){const c=document.getElementById('modeChip'),calls=(d&&d.trace&&d.trace.llm)||[],used=[...new Set(calls.filter(x=>x.status==='ok'&&x.provider).map(x=>x.provider))],name={groq:'Groq',nvidia:'NVIDIA'};
+ if(d&&d.mode==='RULE_BASED_FALLBACK'){c.textContent='mode: rule-based (no AI)';return}
+ c.textContent='mode: AI agents'+(used.length?' ('+used.map(x=>name[x]||x).join(' + ')+')':d?' (all providers failed: rules used)':'')}
+fetch('/llm/status').then(r=>r.json()).then(s=>{const c=document.getElementById('modeChip');if(!c||c.dataset.set)return;const live=Object.entries(s.providers||{}).filter(([k,v])=>v.configured&&v.state!=='quota exhausted'&&v.state!=='down').map(([k])=>({groq:'Groq',nvidia:'NVIDIA'}[k]||k));
+ c.textContent=live.length?'mode: AI ready ('+live.join(' + ')+')':'mode: no AI provider available: rules will be used'}).catch(()=>{});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const NODES=[
+ ['INTAKE','Intake','ai','Turns free text and toggles into a structured case: age, symptoms, history, and what is still missing.'],
+ ['TRIAGE','Triage','ai','Assesses urgency and which capabilities the patient needs. Never names a diagnosis.'],
+ ['CLARIFICATION','Clarifier','ai','Runs in the background beside triage: works out what to ask the caller next, ordered by how much the answer would change the plan.'],
+ ['CRITIC','Critic','ai','Devil\'s advocate over the triage. Looks for under-triage, missing capabilities and contradictions between the report and the fields. Escalate-only: it can raise priority and add preferences, never lower anything.'],
+ ['RED_FLAGS','Red flags','guard','Hard rules (no breathing, unresponsive, severe bleeding). They can only RAISE priority, never lower it.'],
+ ['FACILITY_DISCOVERY','Discovery','ai','Finds hospitals near the patient (8 km, widening to 25 km).'],
+ ['ETA_ROUTING','Routing','ai','Replaces straight-line travel-time guesses with real road travel times (LocationIQ). If unavailable, the estimate is kept and flagged.'],
+ ['RESOURCE_INTERPRETATION','Resources','ai','Fetches each hospital\'s beds, equipment and specialists, each with a timestamp and source.'],
+ ['DISCOVERY_WIDEN','Widen search','ai','Escalation rung 1: if fewer than 3 hospitals are ELIGIBLE nearby, the search widens to 25 km before ranking so there are real alternatives.'],
+ ['BED_CHECK','Bed check','ai','Manual only: scans nearby hospitals\' live bed availability, bypassing caches. When on, bed availability becomes the largest ranking weight.'],
+ ['REQUIREMENTS','Requirements','core','Reshapes the triage output into REQUIRED and PREFERRED capabilities.'],
+ ['FRESHNESS','Freshness','core','Scores how far to trust each data point: source trust x exp(-age / tau).'],
+ ['ELIGIBILITY','Eligibility','core','Hard gate: a hospital must be operational, accepting patients and have every REQUIRED capability. No AI can override it.'],
+ ['ESCALATION','Escalation','core','Flags red-flag cases, AI-review cases and cases with no eligible hospital for a human operator.'],
+ ['RANKING','Ranking','core','Scores eligible hospitals on capability, resources, capacity, specialists, access and data freshness.'],
+ ['ADVISOR','Advisor','ai','Second opinion on the shortlist, consulted only when the choice is close or the top pick is shaky. It may nudge scores of already-eligible hospitals by at most 0.05.'],
+ ['RE_RANK','Re-rank','core','Re-scores with the advisor\'s bounded nudges applied, so ranks and scores stay consistent.'],
+ ['ENGINE','Engine','core','Re-verifies the winner independently, computes confidence and freezes the recommendation.'],
+ ['VALIDATION_GATE','Validation','guard','Five independent safety checks before anything is shown.'],
+ ['EXPLANATION','Explanation','ai','Writes a plain-language explanation of the frozen recommendation. It cannot change it.'],
+];
+const LANE={},LABEL={};NODES.forEach(n=>{LANE[n[0]]=n[2];LABEL[n[0]]=n[1]});
+const PARENT=new Set(['PIPELINE','FRONT_CREW','DETERMINISTIC_CORE']);LABEL.PIPELINE='Pipeline';LABEL.RESOURCE_INTERPRETATION_WIDE='Resources (wide)';LABEL.FRONT_CREW='Front stages';LABEL.DETERMINISTIC_CORE='Deterministic core';
+const OPTS={c:['alert','confused','unresponsive','unknown'],b:['normal','laboured','slow','absent','unknown'],bl:['none','mild','severe','unknown']};
+const PLACES=[['Tambaram',12.9249,80.1],['Adyar',13.0067,80.2565],['Anna Nagar',13.085,80.2101],['T Nagar',13.0418,80.2341],['Velachery',12.975,80.221],['Porur',13.0382,80.1565],['Perambur',13.1143,80.2329],['Outside coverage (Delhi)',28.6139,77.209]];
+const EXAMPLES=[
+ ['Cardiac','60 year old male, sudden collapse, confused, chest pain, diabetic','confused','laboured','none',0],
+ ['Not breathing','man not breathing after collapse','unresponsive','absent','none',1],
+ ['Accident','road accident, 30 year old woman, fracture, bleeding heavily','alert','normal','severe',3],
+ ['Obstetric','pregnant woman in labour, 28 years old','alert','normal','none',2],
+ ['Child','child 5 years old with fever and seizure, no breathing problem','confused','normal','none',4],
+ ['Out of coverage','chest pain','alert','normal','none',7]];
+const F={c:'confused',b:'laboured',bl:'none',loc:'0',source:'MANUAL',acc:null,addr:null};let RUNNING=false;
+const fmt=ms=>ms==null?'—':ms<1?ms.toFixed(2)+' ms':ms<100?ms.toFixed(1)+' ms':ms<1000?Math.round(ms)+' ms':(ms/1000).toFixed(2)+' s';
+let S;const fresh=()=>S={spans:{},running:[],trace:{},sel:null,follow:true,result:null,hl:null,msgs:[]};
+
+/* ---------- form ---------- */
+function save(){try{localStorage.setItem('cedcs_form',JSON.stringify({...F,report:$('report').value,lat:$('lat').value,lng:$('lng').value}))}catch(e){}}
+function load(){try{const j=JSON.parse(localStorage.getItem('cedcs_form')||'null');if(j){Object.assign(F,{c:j.c,b:j.b,bl:j.bl,loc:j.loc});$('report').value=j.report||'';$('lat').value=j.lat||'';$('lng').value=j.lng||''}}catch(e){}
+ if(!$('report').value)$('report').value=EXAMPLES[0][1]}
+function drawSeg(){document.querySelectorAll('.seg').forEach(s=>{const k=s.dataset.key;s.innerHTML=OPTS[k].map(v=>`<button type="button" data-v="${v}" class="${F[k]===v?'on':''}" aria-pressed="${F[k]===v}">${v}</button>`).join('');
+ s.querySelectorAll('button').forEach(b=>b.onclick=()=>{F[k]=b.dataset.v;drawSeg();save()})})}
+function drawLoc(){$('loc').innerHTML=PLACES.map((p,i)=>`<option value="${i}">${esc(p[0])}</option>`).join('')+'<option value="custom">Custom coordinates…</option>';$('loc').value=F.loc;$('custom').hidden=F.loc!=='custom'}
+$('loc').onchange=()=>{F.source='MANUAL';F.acc=null;F.addr=null;F.loc=$('loc').value;$('custom').hidden=F.loc!=='custom';save();previewPatient(true)};$('showRej').onchange=()=>{mapSig='';renderMap()};
+$('examples').innerHTML=EXAMPLES.map((e,i)=>`<button type="button" data-i="${i}">${esc(e[0])}</button>`).join('');
+$('examples').onclick=ev=>{const b=ev.target.closest('button');if(!b)return;const e=EXAMPLES[b.dataset.i];$('report').value=e[1];F.c=e[2];F.b=e[3];F.bl=e[4];F.loc=String(e[5]);F.source='MANUAL';F.acc=null;F.addr=null;drawSeg();drawLoc();save()};
+let qt;$('q').oninput=()=>{clearTimeout(qt);const v=$('q').value.trim();if(v.length<3){$('qres').innerHTML='';return}
+ qt=setTimeout(async()=>{try{const d=await(await fetch('/geocode?q='+encodeURIComponent(v))).json();
+  if(!d.enabled){$('qres').innerHTML='<div class="hint">Address search needs a LocationIQ key on the server.</div>';return}
+  $('qres').innerHTML=d.results.map((r,i)=>`<button type="button" data-i="${i}" style="text-align:left;border-radius:8px">${esc(r.name.length>70?r.name.slice(0,68)+'…':r.name)}</button>`).join('')||'<div class="hint">No matches.</div>';
+  $('qres').onclick=e=>{const b=e.target.closest('button');if(!b)return;const r=d.results[b.dataset.i];F.loc='custom';F.source='GEOCODED';F.acc=null;F.addr=r.name;$('lat').value=r.lat.toFixed(5);$('lng').value=r.lng.toFixed(5);drawLoc();previewPatient(true);locInfo(r.name);$('qres').innerHTML='';$('q').value=r.name.split(',').slice(0,2).join(',');save()}}catch(e){}},350)};
+$('report').oninput=save;$('lat').oninput=()=>{F.source='MANUAL';F.acc=null;F.addr=null;save();previewPatient(true)};$('lng').oninput=()=>{F.source='MANUAL';F.acc=null;F.addr=null;save();previewPatient(true)};
+function coords(){if(F.loc==='custom')return[+$('lat').value,+$('lng').value];const p=PLACES[+F.loc];return[p[1],p[2]]}
+function body(){const[lat,lng]=coords();return JSON.stringify({emergency_report:$('report').value,consciousness:F.c,breathing:F.b,bleeding:F.bl,location_lat:lat,location_lng:lng,location_address:F.addr||(F.loc==='custom'?'custom location':PLACES[+F.loc][0]),location_source:F.source||'MANUAL',location_accuracy_m:F.acc||null,bed_check:!!$('bedcheck').checked&&!$('bedcheck').disabled})}
+
+/* ---------- workflow ---------- */
+function buildFlow(){$('flow').innerHTML=NODES.map(([id,l,lane],i)=>`<div class="node ${lane}" id="n_${id}" data-id="${id}" tabindex="0" role="button"><span class="n">${i+1}</span><b>${l}</b><span class="ms" id="ms_${id}">—</span><div class="share"><i id="sh_${id}"></i></div></div>`).join('');
+ document.querySelectorAll('.node').forEach(n=>{const go=()=>{S.sel=n.dataset.id;S.follow=false;$('flowHint').textContent='following paused — pick another step or run again';renderDetail()};n.onclick=go;n.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}})}
+function nodeState(){const total=(S.spans.PIPELINE||{}).duration_ms;let slow=null;
+ NODES.forEach(([id])=>{const sp=S.spans[id];if(sp&&(!slow||sp.duration_ms>S.spans[slow].duration_ms))slow=id});
+ NODES.forEach(([id])=>{const el=$('n_'+id),sp=S.spans[id];el.className='node '+LANE[id];
+  if(S.running.includes(id))el.classList.add('running');if(sp)el.classList.add(sp.status==='halted'?'halted':'done');
+  if(S.sel===id)el.classList.add('sel');if(S.hl===id)el.classList.add('hl');if(total&&id===slow&&sp.duration_ms>total*.35)el.classList.add('slow');
+  $('ms_'+id).textContent=sp?fmt(sp.duration_ms):(S.running.includes(id)?'running…':'—');$('sh_'+id).style.width=sp&&total?Math.max(3,sp.duration_ms/total*100)+'%':'0'})}
+
+/* ---------- waterfall ---------- */
+function renderWaterfall(){const spans=Object.values(S.spans).sort((a,b)=>a.start_ms-b.start_ms||a.depth-b.depth);if(!spans.length)return;
+ const total=(S.spans.PIPELINE||{}).duration_ms||Math.max(...spans.map(s=>s.start_ms+s.duration_ms));
+ const leaves=spans.filter(s=>!PARENT.has(s.stage));let prev=null,gapSum=0;const gaps={};
+ leaves.forEach(s=>{if(prev!=null){const g=Math.max(0,s.start_ms-prev);if(g>0){gaps[s.stage]=g;gapSum+=g}}prev=Math.max(prev??0,s.start_ms+s.duration_ms)});
+ const busy=leaves.reduce((a,s)=>a+s.duration_ms,0),slow=leaves.reduce((a,b)=>b.duration_ms>a.duration_ms?b:a,leaves[0]);
+ $('wfNote').textContent='total '+fmt(total);
+ const ticks=[0,.25,.5,.75,1].map(f=>`<span style="left:${f*100}%">${fmt(total*f)}</span>`).join('');
+ $('wf').innerHTML=`<div class="wfrow head"><span>Step</span><div class="wfaxis">${ticks}</div><span class="num">Time</span><span class="num" title="Idle time since the previous step ended">Gap</span></div>`+
+ spans.map(s=>{const par=PARENT.has(s.stage),cls=par?'par-c':LANE[s.stage]+'-c',g=gaps[s.stage];
+  return `<div class="wfrow ${S.hl===s.stage?'hl':''}" data-id="${s.stage}" title="${(s.duration_ms/total*100).toFixed(1)}% of total"><span style="padding-left:${s.depth*12}px;${par?'font-weight:700':''}">${esc(LABEL[s.stage]||s.stage)}</span>
+  <div class="wfbar"><i class="${cls}" style="left:${s.start_ms/total*100}%;width:${Math.max(s.duration_ms/total*100,.6)}%"></i></div><span class="num">${fmt(s.duration_ms)}</span><span class="num" style="color:var(--mute)">${g!=null&&g>=.05?fmt(g):''}</span></div>`}).join('')+
+ `<div class="summary"><span>Steps busy <b>${fmt(busy)}</b></span><span>Handoff gaps <b>${fmt(gapSum)}</b></span><span>Slowest <b>${esc(LABEL[slow.stage]||slow.stage)}</b> (${(slow.duration_ms/total*100).toFixed(0)}%)</span>${llmShare(total)}</div>`;
+ $('wf').querySelectorAll('.wfrow[data-id]').forEach(r=>{r.onmouseenter=()=>{S.hl=r.dataset.id;nodeState()};r.onmouseleave=()=>{S.hl=null;nodeState()};r.onclick=()=>{if(LANE[r.dataset.id]){S.sel=r.dataset.id;S.follow=false;renderDetail()}}})}
+
+function llmShare(total){const l=(S.trace.llm||[]).filter(c=>c.status==='ok'),f=(S.trace.llm||[]).filter(c=>c.status!=='ok').length;if(!l.length&&!f)return'';const ms=l.reduce((a,c)=>a+c.ms,0),tk=l.reduce((a,c)=>a+c.tokens,0);
+ const wall=Object.values(S.spans).filter(x=>LANE[x.stage]==='ai'&&['INTAKE','TRIAGE','CLARIFICATION','CRITIC','ADVISOR','EXPLANATION'].includes(x.stage));
+ return `<span>${l.length} LLM calls${f?` (+${f} fell back)`:''} · <b>${fmt(ms)}</b> of model time, overlapping · ${tk} tokens</span>`}
+/* ---------- detail ---------- */
+const kv=o=>'<div class="kv">'+Object.entries(o).map(([k,v])=>`<span>${esc(k)}</span><span>${v}</span>`).join('')+'</div>';
+const tags=a=>(a&&a.length?a:[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="hint">none</span>';
+const pct=v=>`<span class="pct"><span class="bar"><i style="width:${Math.min(100,v*100)}%;background:var(--accent)"></i></span>${(v*100).toFixed(0)}%</span>`;
+function llmInfo(stage){const c=(S.trace.llm||[]).find(x=>x.stage===stage);
+ if(!c)return S.trace.mode==='RULE_BASED_FALLBACK'?'<div class="desc">Rule-based step (no LLM in this mode).</div>':'';
+ if(c.status==='skipped')return `<div class="desc" style="border-left:3px solid var(--mute)"><b>Skipped to save LLM budget.</b> This agent is optional; tokens were kept for triage and the explanation.</div>`;
+ if(c.status!=='ok')return `<div class="desc" style="border-left:3px solid var(--warn)"><b>${c.reason==='rate_limited'?'Groq rate limit reached on every model (free tier: 8,000 tokens/min per model). Rule-based result used instead.':'LLM failed, rule-based result used instead.'}</b><br><span class="hint">${esc(c.error)}</span></div>`;
+ return `<div class="desc" style="border-left:3px solid var(--ok)">LLM <b>${esc(c.model)}</b> via <b>${esc(c.provider||'?')}</b> · ${fmt(c.ms)} · ${c.tokens} tokens${c.attempts>1?` · <b class="PROVISIONAL">needed a retry</b> (${esc(c.first_attempt_error||'')})`:''}${c.rate_limit_wait_s?` · waited ${c.rate_limit_wait_s}s for rate limit`:''}${(c.failover||[]).length?` · <b class="PROVISIONAL">failed over</b> (${esc(c.failover.join('; '))})`:''}${(c.dropped_capabilities||[]).length?` · dropped unknown capabilities: ${esc(c.dropped_capabilities.join(', '))}`:''}</div>`}
+function detailFor(id){const t=S.trace;switch(id){
+ case 'INTAKE':{const i=t.intake;if(!i)return;return llmInfo('INTAKE')+((t.input_conflicts||[]).length?`<div class="desc" style="border-left:3px solid var(--bad)"><b>Text overrode a toggle (worst case wins):</b><br>${t.input_conflicts.map(c=>`${esc(c.field)}: ${esc(c.toggle)} → <b>${esc(c.text)}</b> because the report says “${esc(c.phrase)}”`).join('<br>')}</div>`:'')+kv({Age:esc(i.age??'unknown'),Gender:esc(i.gender??'unknown'),Consciousness:esc(i.consciousness),Breathing:esc(i.breathing),Bleeding:esc(i.bleeding),Symptoms:tags(i.symptoms),History:tags(i.history),Onset:esc(i.onset??'unknown'),'Missing, by impact':tags(i.missing_fields),Completeness:pct(i.completeness)})}
+ case 'TRIAGE':{const x=t.triage;if(!x)return;return llmInfo('TRIAGE')+kv({Priority:`<span class="badge P-${x.priority}">${esc(x.priority)}</span>${x.raised_by_rule_floor?` <span class="hint">raised by the rule-engine safety floor (LLM said lower)</span>`:''}`,'Rule engine says':x.rule_priority?esc(x.rule_priority):'—',...(x.raised_by_critic?{'Raised by critic':esc(x.raised_by_critic)}:{}),Categories:tags(x.categories),Required:tags(x.required),Preferred:tags(x.preferred),Confidence:pct(x.confidence),Rationale:esc(x.rationale)})}
+ case 'RED_FLAGS':{const r=t.red_flags;if(!r)return;return kv({'Agent priority':esc(r.agent_priority),'Final priority':`<span class="badge P-${r.final_priority}">${esc(r.final_priority)}</span>`,'Rules fired':tags(r.rules)})+`<p class="hint">Rules use max(), so they can only raise priority.</p>`}
+ case 'FACILITY_DISCOVERY':{const d=t.discovery;if(!d)return;return kv({'Search radius':d.radius_km+' km'+(d.widened_from?` (widened from ${d.widened_from} km: only ${d.eligible_before} eligible)`:d.radius_km>8?' (widened: fewer than 3 nearby)':''),'Hospitals found':d.count,'Travel time':(t.routing&&t.routing.routed)?`${t.routing.routed} by real road route (tier 2), ${t.routing.fallback} estimated`:'straight-line estimate (tier 4): distance / 30 km/h x 1.4'})}
+ case 'ETA_ROUTING':{const r=t.routing;if(!r)return;return r.provider?kv({Provider:esc(r.provider),'Routed (real road time)':r.routed,'Estimated (straight line)':r.fallback,'ETA tier':r.routed?'Tier 2 — live route, no traffic':'Tier 4 — estimate',Note:r.error?'<b class="PROVISIONAL">service unavailable, estimates kept</b>':'Nearest 24 hospitals are routed in one call; results cached 5 min.'}):kv({Status:r.reason==='no candidates'?'Skipped — no candidate hospitals':'Not configured — using straight-line estimates (tier 4)'})}
+ case 'BED_CHECK':{const bc=t.bed_check;if(!bc)return;if(!bc.active)return kv({Status:'<b>Off</b>',Why:esc(bc.blocked||'The bed checker runs only when someone switches it on (the toggle in the form, or the admin).')});
+  const b=t.beds;if(!b)return kv({Status:'Running…'});if(b.error)return kv({Status:'<b class="LOW">scan failed, last known beds used</b>',Error:esc(b.error)});
+  return kv({Switched_on_by:esc(bc.by),Hospitals_scanned:b.hospitals.length,Scan_took:fmt(b.took_ms),Scanned_at:esc(new Date(b.scanned_at).toLocaleTimeString()),Effect:'Bed availability is now the largest ranking weight (35%)'})+'<p class="hint">Full table: Bed availability card below.</p>'}
+ case 'DISCOVERY_WIDEN':{const d=t.discovery;if(!d)return;return d.widened_from?kv({Trigger:`only ${d.eligible_before} eligible hospital(s) within ${d.widened_from} km (need 3)`,Action:`search widened to ${d.radius_km} km`,'Hospitals now':d.count,Effect:'more candidates to rank, so the recommendation has real alternatives'}):kv({Status:'<b>Not needed</b>',Why:'at least 3 eligible hospitals were found within the first search radius'})}
+ case 'RESOURCE_INTERPRETATION':return t.freshness?kv({'Records fetched':t.freshness.records,Source:'resource service (Postgres + PostGIS)'}):void 0;
+ case 'REQUIREMENTS':{const x=t.triage;if(!x)return;return kv({REQUIRED:tags(x.required),PREFERRED:tags(x.preferred.filter(p=>!x.required.includes(p)))})}
+ case 'FRESHNESS':{const f=t.freshness;if(!f)return;const tot=f.records||1,seg=(k,c)=>`<i style="width:${f[k]/tot*100}%;background:var(${c})" title="${k} ${f[k]}"></i>`;
+  return `<div class="bar" style="height:16px;margin-bottom:8px">${seg('FRESH','--ok')}${seg('RECENT','--accent')}${seg('STALE','--warn')}${seg('UNKNOWN','--bad')}</div>`+kv({FRESH:f.FRESH,RECENT:f.RECENT,STALE:f.STALE,UNKNOWN:f.UNKNOWN})+`<p class="hint">confidence = source trust x exp(-age / tau). tau is 30 min for emergency beds and 30 days for departments.</p>`}
+ case 'ELIGIBILITY':{const e=t.eligibility;if(!e)return;const c=e.candidates,n=k=>c.filter(x=>x.status===k).length;
+  return `<div class="hint" style="margin-bottom:6px">${c.length} candidates: <b class="ELIGIBLE">${n('ELIGIBLE')} eligible</b> · <b class="PROVISIONAL">${n('PROVISIONAL')} provisional</b> · <b class="REJECTED">${n('REJECTED')} rejected</b></div>
+  <div class="scroll"><table><tr><th>Hospital</th><th>Result</th>${e.required.map(x=>`<th title="${esc(x)}">${esc(x.slice(0,6))}</th>`).join('')}</tr>`+
+  c.map(x=>{const blank=e.required.every(k=>x.checks[k]==='UNKNOWN'),inf=x.inferred_checks||[];
+   return `<tr data-id="${esc(x.id)}"><td>${esc(x.name)}</td><td class="${x.status}">${x.status}${x.reason?'<div class="hint">'+esc(x.reason)+'</div>':''}</td>${blank?`<td colspan="${e.required.length}" class="hint">${x.status==='REJECTED'?'not checked':'no facility data reported yet: confirm by phone'}</td>`:e.required.map(k=>`<td class="${x.checks[k]}" title="${k}: ${x.checks[k]}${inf.includes(k)?' (declared on the map, not confirmed by the hospital)':''}">${{PRESENT:'✓',ABSENT:'✗',UNKNOWN:'?'}[x.checks[k]]}${inf.includes(k)?'*':''}</td>`).join('')}</tr>`}).join('')+`</table></div><div class="hint" style="margin-top:6px">✓ confirmed · ✓* declared on the map, unverified · ✗ absent · ? not reported. Real hospitals report nothing until they use their console, so most rows are "provisional".</div>`}
+ case 'ESCALATION':{const c=t.confidence;if(!t.red_flags)return;return kv({Escalated:c?(c.escalated?'<b class="LOW">yes</b>':'no'):'…',Reason:esc(c&&c.escalation_reason||'none')})}
+ case 'RANKING':{const r=t.ranking;if(!r)return;const cols={CAP:'--ai',RES:'--core',CAPY:'--ok',SPEC:'--warn',ACC:'--accent',FRESH:'--mute',...(r.weights.BEDS?{BEDS:'--accent2'}:{})},max=Math.max(...r.ranked.map(x=>x.score),.01);
+  return `<div class="hint">Weights for <b>${esc(r.priority)}</b>: ${Object.entries(r.weights).map(([k,v])=>`${k} ${v}`).join(' · ')}</div><div style="margin:6px 0">${Object.entries(cols).map(([k,c])=>`<span class="tag"><i class="dot" style="background:var(${c})"></i>${k}</span>`).join('')}<span class="tag"><i class="dot" style="background:var(--warn)"></i>AI nudge</span></div>
+  <div class="scroll">`+r.ranked.slice(0,10).map(x=>`<div style="margin:6px 0" data-id="${esc(x.id)}"><div>#${x.rank} ${esc(x.name)} <span class="hint">score ${x.score.toFixed(3)}${x.provisional?' · provisional x'+x.penalty:''}</span></div>
+  <div class="bar" style="width:${x.score/max*100}%;height:12px">${Object.entries(cols).map(([k,c])=>`<i style="width:${x.contributions[k]*x.penalty/x.score*100}%;background:var(${c})" title="${k} ${x.contributions[k].toFixed(3)}"></i>`).join('')}${x.ai_adjustment>0?`<i style="width:${x.ai_adjustment/x.score*100}%;background:repeating-linear-gradient(45deg,var(--warn),var(--warn) 3px,transparent 3px,transparent 6px)" title="AI advisor +${x.ai_adjustment.toFixed(3)}"></i>`:''}</div>${x.ai_adjustment?`<div class="hint">AI advisor ${x.ai_adjustment>0?'+':''}${x.ai_adjustment.toFixed(3)}</div>`:''}</div>`).join('')+'</div>'}
+ case 'ENGINE':{const c=t.confidence;if(!c)return;const T=c.terms,parts=[['Case info x triage certainty',T.input],['Resource data',T.data],['Margin over runner-up',T.margin],['ETA-tier cap',T.eta_cap]],bind=Math.min(...parts.map(p=>p[1]));
+  return `<div style="margin-bottom:8px"><span class="badge ${c.level}">${c.level}</span> confidence <b>${c.value.toFixed(2)}</b> = the smallest of:</div>`+parts.map(([n,v])=>`<div style="display:flex;justify-content:space-between;gap:10px;margin:5px 0"><span>${esc(n)} ${v===bind?'<b class="LOW">← limiting</b>':''}</span>${pct(v)}</div>`).join('')+`<p class="hint">The engine also re-verifies the top hospital's REQUIRED capabilities from scratch and fails closed if none pass.</p>`}
+ case 'VALIDATION_GATE':{const v=t.validation;if(!v)return;return '<table>'+v.map(c=>`<tr><td class="${c.passed?'PRESENT':'ABSENT'}" style="white-space:nowrap">${c.passed?'✓ pass':'✗ FAIL'}</td><td>${esc(c.name.replace(/_/g,' '))}<div class="hint">${esc(c.detail)}</div></td></tr>`).join('')+'</table>'}
+ case 'CLARIFICATION':{const c=t.clarification;if(!c)return;return llmInfo('CLARIFICATION')+(c.questions.length?'<ol style="margin:0;padding-left:18px">'+c.questions.map(q=>`<li style="margin:6px 0">${esc(q.question)}<div class="hint">why: ${esc(q.impact)}</div></li>`).join('')+'</ol>':'<span class="hint">No impactful missing fields.</span>')+`<p class="hint">${esc(c.rationale||'')}</p>`}
+ case 'CRITIC':{const c=t.critic;if(!c)return(t.llm||[]).some(x=>x.stage==='CRITIC')?llmInfo('CRITIC'):void 0;const ap=c.applied||{};
+  return llmInfo('CRITIC')+kv({Concerns:c.concerns.length?'<ul style="margin:0;padding-left:16px">'+c.concerns.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'<span class="hint">none</span>',
+   'Contradictions':c.contradictions.length?'<ul style="margin:0;padding-left:16px">'+c.contradictions.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>':'<span class="hint">none</span>',
+   'Suggested priority':esc(c.suggested_priority||'no change'),'Applied to the case':(ap.priority_raised_to?`<span class="tag">priority raised to ${esc(ap.priority_raised_to)}</span>`:'')+(ap.added_preferred?ap.added_preferred.map(x=>`<span class="tag">+${esc(x)} (preferred)</span>`).join(''):'')+(ap.human_review?'<span class="tag">human review requested</span>':'')+(ap.human_review_ignored?`<span class="hint">review request ignored: ${esc(ap.human_review_ignored)}</span>`:'')||'<span class="hint">nothing changed</span>',Rationale:esc(c.rationale)})+'<p class="hint">Escalate-only: the critic can raise caution, never lower it.</p>'}
+ case 'ADVISOR':{const a=t.advisor;if(!a)return;if(!a.called)return kv({Decision:'<b>Skipped by the orchestrator</b>',Why:esc(a.reason)})+'<p class="hint">Skipping saves an LLM call when the engine already has a clear winner.</p>';
+  if(a.error)return kv({Consulted:esc((a.reasons||[]).join('; ')),Result:'<b class="LOW">advisor unavailable, engine ranking kept</b>',Error:esc(a.error)});
+  const o=a.opinion;return llmInfo('ADVISOR')+kv({'Why consulted':esc(a.reasons.join('; ')),Opinion:esc(o.reasoning),Concerns:tags(o.concerns),'Score nudges':Object.entries(a.adjustments).map(([k,v])=>`<span class="tag">${esc(k)} ${v>0?'+':''}${v.toFixed(3)}</span>`).join('')||'<span class="hint">none</span>',
+   'Effect':a.changed_top?'<b class="PROVISIONAL">changed the top choice</b>':'kept the top choice',Confidence:pct(o.confidence)})+'<p class="hint">Bounded to +-0.05, only among hospitals that already passed the eligibility gate.</p>'}
+ case 'RE_RANK':{const a=t.advisor;if(!a||!a.adjustments)return;return kv({'Nudges applied':Object.entries(a.adjustments).map(([k,v])=>`<span class="tag">${esc(k)} ${v>0?'+':''}${v.toFixed(3)}</span>`).join(''),'Top before':esc(a.top_before),'Top after':esc(a.top_after)})}
+ case 'EXPLANATION':return S.result&&S.result.explanation_text?llmInfo('EXPLANATION')+`<div class="scroll"><pre>${esc(S.result.explanation_text)}</pre></div>`:void 0}}
+function renderDetail(){nodeState();const id=S.sel;if(!id)return;const n=NODES.find(x=>x[0]===id);$('detTitle').textContent='Step detail · '+n[1];
+ $('det').innerHTML=`<p class="desc">${esc(n[3])}</p>`+(detailFor(id)||'<div class="skel" style="width:60%"></div>');
+ $('det').querySelectorAll('[data-id]').forEach(r=>{r.onmouseenter=()=>hlH(r.dataset.id,1);r.onmouseleave=()=>hlH(r.dataset.id,0)})}
+
+/* ---------- KPIs / recommendation / map ---------- */
+function ring(v,level){const R=20,C=2*Math.PI*R,col={HIGH:'--ok',MODERATE:'--warn',LOW:'--bad'}[level]||'--mute';
+ return `<svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="${R}" fill="none" stroke="var(--barbg)" stroke-width="6"/><circle cx="26" cy="26" r="${R}" fill="none" stroke="var(${col})" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C*v} ${C}" transform="rotate(-90 26 26)"/><text x="26" y="30" text-anchor="middle" style="font-size:12px;font-weight:700">${Math.round(v*100)}</text></svg>`}
+function renderKPIs(){const t=S.trace,R=S.result&&S.result.recommendation,e=t.eligibility,rf=t.red_flags,tr=t.triage,cf=t.confidence;const PT={CRITICAL:'--bad',HIGH:'--warn',MODERATE:'--accent',LOW:'--ok'},TONE={'Priority':PT[(rf&&rf.final_priority)||(tr&&tr.priority)]||'--line','Recommended hospital':'--accent','Confidence':{HIGH:'--ok',MODERATE:'--warn',LOW:'--bad'}[cf&&cf.level]||'--line','Eligible hospitals':'--core','AI agents':'--ai','Total latency':'--accent2'};
+ const T=(k,v,s,cls='')=>`<div class="kpi ${cls}" style="--tone:var(${TONE[k]||'--line'})"><div class="k">${k}</div>${v}<div class="s">${s||''}</div></div>`;
+ const pend='<div class="v" style="color:var(--mute);font-weight:500;font-size:15px">…</div>';
+ const pri=rf?`<div class="v P-${rf.final_priority}">${rf.final_priority}</div>`:tr?`<div class="v P-${tr.priority}">${tr.priority}</div>`:pend;
+ const priS=rf&&rf.agent_priority!==rf.final_priority?`raised from ${rf.agent_priority} by ${rf.rules.join(', ')}`:tr?`${tr.categories.join(', ')||'general'}`:'';
+ const halted=S.result&&S.result.halted;
+ let reco=T('Recommended hospital',pend,'',' wide');
+ if(R)reco=T('Recommended hospital',`<div class="v">${esc(R.primary.name)}</div>`,`ETA ${R.primary.eta_min??'?'} min · score ${R.primary.overall_score.toFixed(2)}`,'wide');
+ else if(halted)reco=T('Recommended hospital','<div class="v LOW">Operator handoff</div>','no safe automated recommendation','wide');
+ const conf=cf?`<div class="ring">${ring(cf.value,cf.level)}<div><div class="v ${cf.level}" style="font-size:16px">${cf.level}</div></div></div>`:pend;
+ const elig=e?(()=>{const c=e.candidates,ok=c.filter(x=>x.status!=='REJECTED').length;return `<div class="v">${ok} <span style="font-weight:400;color:var(--mute)">/ ${c.length}</span></div>`})():pend;
+ const total=(S.spans.PIPELINE||{}).duration_ms;
+ $('kpis').innerHTML=T('Priority',pri,priS)+reco+T('Confidence',conf,cf?`limited by ${limit(cf.terms)}`:'')+T('Eligible hospitals',elig,e?`${e.required.length} required capabilities`:'')+T('AI agents',(()=>{const l=(t.llm||[]).filter(c=>c.status!=='skipped'),ok=l.filter(c=>c.status==='ok').length,fb=l.length-ok;return l.length?`<div class="v">${ok}<span style="font-weight:400;color:var(--mute)"> / ${l.length}</span></div>`:'<div class="v" style="color:var(--mute);font-weight:500;font-size:15px">rules only</div>'})(),(()=>{const l=(t.llm||[]).filter(c=>c.status==='ok');return l.length?`${l.reduce((a,c)=>a+c.tokens,0)} tokens · ${(t.llm||[]).filter(c=>c.status==='fallback').length} fell back · ${(t.llm||[]).filter(c=>c.status==='skipped').length} skipped`:''})())+T('Total latency',total?`<div class="v">${fmt(total)}</div>`:pend,total?slowest():'')}
+function limit(T){const m=[['case info',T.input],['resource data',T.data],['score margin',T.margin],['ETA tier',T.eta_cap]].reduce((a,b)=>b[1]<a[1]?b:a);return m[0]}
+function slowest(){const l=Object.values(S.spans).filter(s=>!PARENT.has(s.stage));if(!l.length)return'';const s=l.reduce((a,b)=>b.duration_ms>a.duration_ms?b:a);return 'slowest: '+(LABEL[s.stage]||s.stage).toLowerCase()}
+function renderReport(){const d=S.result,card=$('reportCard');if(!d||!d.explanation_text){card.hidden=true;return}card.hidden=false;
+ const llm=((S.trace&&S.trace.llm)||[]).find(x=>x.stage==='EXPLANATION'&&x.status==='ok');$('repSrc').textContent=llm?'written by AI ('+({groq:'Groq',nvidia:'NVIDIA'}[llm.provider]||llm.provider||'LLM')+')':'template';
+ const inl=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');let h='',open=false;
+ for(const raw of d.explanation_text.split(/\r?\n/)){const l=raw.trimEnd();const li=l.match(/^\s*[-*•]\s+(.*)/);
+  if(li){if(!open){h+='<ul>';open=true}h+='<li>'+inl(li[1])+'</li>';continue}if(open){h+='</ul>';open=false}
+  if(!l.trim())continue;h+=/^\*\*.+\*\*:?\s*$/.test(l.trim())?'<div class="rh">'+inl(l.trim())+'</div>':'<p>'+inl(l)+'</p>'}
+ if(open)h+='</ul>';$('reportBody').innerHTML=h;$('repCopy').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(d.explanation_text).then(()=>{$('repCopy').textContent='Copied';setTimeout(()=>$('repCopy').textContent='Copy',1500)})}
+function renderReco(){const d=S.result;if(!d)return;const R=d.recommendation;if(!R){$('reco').innerHTML='<div class="empty">No recommendation. This case needs a human operator.</div>';return}
+ const row=(x,i)=>`<div class="h" data-id="${esc(x.hospital_id)}"><div class="rk">${x.rank}</div><div><b>${esc(x.name)}</b><div class="hint">${esc(x.ranking_reason)}</div>${realInfo(candById(x.hospital_id),true)}</div><div class="num" style="white-space:nowrap">${x.eta_min??'?'} min</div></div>`;
+ $('reco').innerHTML=row(R.primary)+`<div class="lab" style="margin:12px 0 2px">Alternatives</div>`+(R.alternatives.map(row).join('')||'<div class="hint">none</div>')+
+  `<div class="lab" style="margin:12px 0 2px">Excluded (${R.rejected.length})</div><div class="scroll" style="max-height:170px">`+R.rejected.map(x=>`<div class="h" data-id="${esc(x.hospital_id)}"><div class="rk x">✗</div><div><b>${esc(x.name)}</b><div class="hint">${esc(x.rejection_reason)}</div></div><div></div></div>`).join('')+'</div>'+
+  `<div class="lab" style="margin:12px 0 2px">Caveats</div>`+R.caveats.map(c=>`<div class="hint">• ${esc(c.detail)}</div>`).join('');
+ $('reco').querySelectorAll('.h').forEach(r=>{r.onmouseenter=()=>hlH(r.dataset.id,1);r.onmouseleave=()=>hlH(r.dataset.id,0)})}
+function hlH(id,on){if(LM&&MK[id]){const el=MK[id].getElement();if(el){const m=el.querySelector('.hm');if(m)m.classList.toggle('hl',!!on)}on?MK[id].openTooltip():MK[id].closeTooltip()}
+ document.querySelectorAll(`#map [data-id="${CSS.escape(id)}"] circle:last-of-type`).forEach(c=>c.setAttribute('r',on?11:c.dataset.r));document.querySelectorAll(`.h[data-id="${CSS.escape(id)}"]`).forEach(r=>r.classList.toggle('hl',!!on))}
+function renderSvgMap(){const e=S.trace.eligibility,d=S.trace.discovery;if(!e||!d||!d.patient)return;const pts=e.candidates.filter(c=>c.lat!=null);if(!pts.length)return;
+ const P=d.patient,W=560,H=380,pad=30,k=Math.cos(P.lat*Math.PI/180),xs=pts.map(c=>c.lng*k).concat(P.lng*k),ys=pts.map(c=>c.lat).concat(P.lat);
+ const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),sc=Math.min((W-2*pad)/((x1-x0)||1),(H-2*pad)/((y1-y0)||1)),X=g=>pad+(g*k-x0)*sc,Y=a=>H-pad-(a-y0)*sc;
+ const rank={};(S.trace.ranking?S.trace.ranking.ranked:[]).forEach(r=>rank[r.id]=r.rank);const col={ELIGIBLE:'var(--ok)',PROVISIONAL:'var(--warn)',REJECTED:'var(--bad)'};
+ const rings=[1,2,3].map(i=>{const r=Math.max(...pts.map(c=>Math.hypot(X(c.lng)-X(P.lng),Y(c.lat)-Y(P.lat))))*i/3;return `<circle cx="${X(P.lng)}" cy="${Y(P.lat)}" r="${r}" fill="none" stroke="var(--line)" stroke-dasharray="3 4"/>`}).join('');
+ $('map').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Map of candidate hospitals" style="background:var(--barbg);border-radius:10px">${rings}`+
+ pts.map(c=>{const r=rank[c.id],top=r&&r<=4,rad=top?8:5;return `<g data-id="${esc(c.id)}"><title>${esc(c.name)} · ${c.status}${r?' · rank '+r:''}${c.reason?' · '+esc(c.reason):''} · ETA ${c.eta_min??'?'} min</title>
+  ${r===1?`<circle cx="${X(c.lng)}" cy="${Y(c.lat)}" r="14" fill="none" stroke="var(--ok)" stroke-width="2.5"/>`:''}
+  <circle cx="${X(c.lng)}" cy="${Y(c.lat)}" r="${rad}" data-r="${rad}" fill="${col[c.status]}" opacity="${c.status==='REJECTED'?.5:1}"/>${top?`<text x="${X(c.lng)}" y="${Y(c.lat)+3.5}" text-anchor="middle" style="fill:#fff;font-weight:700;pointer-events:none">${r}</text>`:''}</g>`}).join('')+
+ `<g><title>Patient</title><path d="M${X(P.lng)} ${Y(P.lat)-10} l3.2 6.5 7 1 -5.1 5 1.2 7 -6.3 -3.3 -6.3 3.3 1.2 -7 -5.1 -5 7 -1z" fill="var(--accent)" stroke="var(--card)" stroke-width="1.5"/></g></svg>
+ <div class="hint" style="margin-top:6px"><span style="color:var(--accent)">★</span> patient · <span class="ELIGIBLE">●</span> eligible · <span class="PROVISIONAL">●</span> provisional · <span class="REJECTED">●</span> rejected · dashed rings = distance · numbers = rank · hover a hospital in the list</div>`}
+function renderAlerts(){const d=S.result,rf=S.trace.red_flags;let h='';
+ if(d&&d.halted)h+=`<div class="alert"><b>Operator handoff required.</b> The system found no safe automated recommendation.<div class="hint">${esc(d.halt_reason)}</div></div>`;
+ else if(d&&d.recommendation&&d.recommendation.escalated)h+=`<div class="alert"><b>Escalated for human review:</b> ${esc(d.recommendation.escalation_reason)}</div>`;
+ if(d&&d.recommendation&&d.recommendation.caveats.some(c=>c.caveat_type==='PROVISIONAL_VERIFICATION_NEEDED'))h+=`<div class="alert warn"><b>Verify by phone:</b> some required capabilities at the primary hospital could not be confirmed from current data.</div>`;
+ $('alerts').innerHTML=h}
+
+/* ---------- orchestration map ---------- */
+const NS='http://www.w3.org/2000/svg';
+const ACT={
+ ORCH:{x:480,y:220,w:210,h:70,t:'Orchestrator',s:'plans · dispatches · joins',lane:'hub'},
+ INTAKE:{x:80,y:50,t:'Intake agent',s:'free text → case',lane:'ai',stage:'INTAKE'},
+ TRIAGE:{x:240,y:50,t:'Triage agent',s:'urgency + capabilities',lane:'ai',stage:'TRIAGE'},
+ CLARIFY:{x:400,y:50,t:'Clarifier',s:'what to ask next',lane:'ai',stage:'CLARIFICATION'},
+ CRITIC:{x:560,y:50,t:'Critic',s:'challenges the triage',lane:'ai',stage:'CRITIC'},
+ ADVISOR:{x:720,y:50,t:'Advisor',s:'second opinion',lane:'ai',stage:'ADVISOR'},
+ NARRATOR:{x:880,y:50,t:'Narrator',s:'plain-language explanation',lane:'ai',stage:'EXPLANATION'},
+ REGISTRY:{x:110,y:392,t:'Hospital registry',s:'resource service · Neon',lane:'svc'},
+ ROUTER:{x:290,y:392,t:'Road router',s:'LocationIQ',lane:'svc'},
+ CORE:{x:480,y:392,t:'Deterministic core',s:'eligibility · ranking · engine',lane:'core',w:170},
+ RED_FLAGS:{x:670,y:392,t:'Red-flag rules',s:'escalate-only',lane:'guard'},
+ VALIDATOR:{x:850,y:392,t:'Validation gate',s:'5 safety checks',lane:'guard'},
+ BEDCHECK:{x:90,y:220,t:'Bed checker',s:'manual live scan',lane:'svc'},
+ DISPATCH:{x:870,y:220,t:'Dispatch',s:'email · ambulance · confirm',lane:'out'}};
+const LCOL={ai:'--ai',svc:'--mute',core:'--core',guard:'--guard',hub:'--accent',out:'--accent2'},KCOL={command:'--accent',result:'--ok',error:'--bad',skip:'--mute'};
+const short=n=>ACT[n]?ACT[n].t:n;
+function mapBuild(){const W=148,H=64;let e='',n='';
+ Object.entries(ACT).forEach(([id,a])=>{if(id==='ORCH')return;e+=`<line class="edge" id="e_${id}" x1="${ACT.ORCH.x}" y1="${ACT.ORCH.y}" x2="${a.x}" y2="${a.y}"/>`});
+ Object.entries(ACT).forEach(([id,a])=>{const w=a.w||W,h=a.h||H,hub=id==='ORCH';
+  n+=`<g class="nd ${hub?'hub':'idle'}" id="a_${id}" style="--lc:var(${LCOL[a.lane]})"><rect x="${a.x-w/2}" y="${a.y-h/2}" width="${w}" height="${h}" rx="10"/>
+  <rect x="${a.x-w/2}" y="${a.y-h/2}" width="5" height="${h}" rx="2" class="bar-lane" style="fill:var(${LCOL[a.lane]})"/>
+  <text x="${a.x+2}" y="${a.y-h/2+17}" text-anchor="middle">${a.t}</text><text class="sub" x="${a.x+2}" y="${a.y-h/2+31}" text-anchor="middle">${a.s}</text>
+  <text class="res" id="r_${id}" x="${a.x+2}" y="${a.y-h/2+45}" text-anchor="middle"></text><text class="mdl" id="m_${id}" x="${a.x+2}" y="${a.y-h/2+58}" text-anchor="middle"></text></g>`});
+ $('omap').innerHTML=`<defs><linearGradient id="hubgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent2)"/><stop offset="1" stop-color="var(--accent)"/></linearGradient></defs>`+e+`<g id="pk"></g>`+n}
+function trunc(t,n){t=String(t||'');return t.length>n?t.slice(0,n-1)+'…':t}
+function mapSet(id,state,label){const g=$('a_'+id);if(!g)return;g.setAttribute('class','nd '+(id==='ORCH'?'hub ':'')+state);if(label!=null)$('r_'+id).textContent=trunc(label,id==='ORCH'?34:24)}
+function mapReset(){mapBuild();$('mlog').innerHTML='';$('plan').innerHTML='';S.msgs=[]}
+function mapBadges(){(S.trace.llm||[]).forEach(c=>{const id=Object.keys(ACT).find(k=>ACT[k].stage===c.stage);if(!id)return;const el=$('m_'+id);if(!el)return;
+ el.textContent=c.status==='ok'?`${c.provider?c.provider+' · ':''}${c.model.split('/').pop()} · ${fmt(c.ms)}${(c.failover||[]).length?' ↪':''}`:c.status==='skipped'?'skipped (token budget)':c.reason==='rate_limited'?'rules (rate limited)':'rules (LLM failed)';el.style.fill=(c.status==='ok'||c.status==='skipped')?'':'var(--bad)'})}
+function packet(frm,to,kind){const a=ACT[frm],b=ACT[to];if(!a||!b||!$('pk'))return;const c=document.createElementNS(NS,'circle');c.setAttribute('r',6);c.setAttribute('fill','var('+KCOL[kind]+')');c.setAttribute('stroke','var(--card)');c.setAttribute('stroke-width',2);$('pk').appendChild(c);
+ const other=frm==='ORCH'?to:frm,ed=$('e_'+other);if(ed){ed.classList.add('active');setTimeout(()=>ed.classList.remove('active'),700)}
+ const t0=performance.now(),D=600;(function step(now){const p=Math.min(1,(now-t0)/D),q=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;c.setAttribute('cx',a.x+(b.x-a.x)*q);c.setAttribute('cy',a.y+(b.y-a.y)*q);if(p<1)requestAnimationFrame(step);else c.remove()})(t0);requestAnimationFrame(function s2(now){})}
+function onMessage(m){S.msgs.push(m);packet(m.from,m.to,m.kind);
+ if(m.kind==='command')mapSet(m.to,'working',m.label);else if(m.kind==='result')mapSet(m.from,'done',m.label);else if(m.kind==='error')mapSet(m.from,'error',m.label);else if(m.kind==='skip')mapSet(m.to,'skip',m.label);
+ const l=$('mlog');l.insertAdjacentHTML('beforeend',`<div class="k-${m.kind}"><span class="t">${(m.t_ms/1000).toFixed(2)}s</span> ${esc(short(m.from))} → ${esc(short(m.to))}  <b>${esc(m.kind)}</b> ${esc(m.label)}</div>`);l.scrollTop=l.scrollHeight}
+function renderPlan(){const p=S.trace.plan||[];$('plan').innerHTML=p.length?'<div class="lab" style="margin:8px 0 2px">Orchestrator decisions</div>'+p.map(d=>`<div>• <b>${esc(d.decision)}</b> <span class="hint">— ${esc(d.why)}</span></div>`).join(''):''}
+async function replay(){if(!S.result)return;$('replay').disabled=true;const keep=S.result;S.msgs=[];mapBuild();$('mlog').innerHTML='';mapBadges();mapSet('ORCH','working','replaying…');
+ for(const m of keep.messages){onMessage(m);await sleep(m.kind==='command'?260:340)}mapSet('ORCH',keep.halted?'error':'done',keep.halted?'handoff to operator':'recommendation ready');$('replay').disabled=false}
+/* ---------- real-hospital helpers ---------- */
+const candById=id=>((S.trace&&S.trace.eligibility)?S.trace.eligibility.candidates.find(c=>c.id===id):null)||((S.trace&&S.trace.discovery&&S.trace.discovery.hospitals)?S.trace.discovery.hospitals.find(c=>c.id===id):null);
+function bedsLine(id){const b=S.trace&&S.trace.beds&&S.trace.beds.hospitals?S.trace.beds.hospitals.find(h=>h.id===id):null;if(!b||!Object.keys(b.beds).length)return null;
+ return BEDCOLS.filter(([k])=>b.beds[k]&&b.beds[k].available!=null).map(([k,l])=>`${l} ${b.beds[k].available}${b.beds[k].total!=null?'/'+b.beds[k].total:''}`).join(' · ')}
+function realInfo(c,compact){if(!c||c.source!=='osm')return'';const bl=bedsLine(c.id);
+ return`<div class="hint" style="margin-top:4px">🏥 <b>Real hospital</b> (OpenStreetMap)${c.address?' · '+esc(c.address):''}<br>${c.phone?'📞 '+esc(c.phone):'📞 no phone in the map data'} · ${c.status_verified?'status reported by the hospital':'open/closed status not verified'}<br>${c.hours?'🕒 '+esc(c.hours)+' (map data)<br>':''}${bl?'Beds reported: '+esc(bl):'Beds: <b>not reported</b>'}<br>${(c.inferred&&c.inferred.length)?'Facilities per map data <i>(unverified)</i>: '+esc(c.inferred.join(', ')):'Facilities: <b>not reported</b>'}${c.website?` · <a href="${esc(c.website)}" target="_blank" rel="noopener">website ↗</a>`:''}${c.osm_url?` · <a href="${esc(c.osm_url)}" target="_blank" rel="noopener">OpenStreetMap ↗</a>`:''}${compact?'':' <br>Verify by phone before dispatch.'}</div>`}
+function consoleForm(c){if(!c||c.source!=='osm')return'';return`<details class="conf" style="margin-top:6px"><summary class="hint" style="cursor:pointer">Set up this hospital's console (admin)</summary>
+ <input class="ce" placeholder="dispatch email (optional)" style="margin:4px 0"><input class="cp" placeholder="phone (optional)" value="${esc(c.phone||'')}" style="margin-bottom:4px"><button type="button" class="btn ghost sm mkcon" data-id="${esc(c.id)}" data-name="${esc(c.name)}">Create console link</button><div class="hint cmsg"></div></details>`}
+document.addEventListener('click',async e=>{const b=e.target.closest('.mkcon');if(!b)return;const box=b.closest('.conf'),msg=box.querySelector('.cmsg');let tok='';try{tok=sessionStorage.getItem('cedcs_admin')||$('adminTok').value||''}catch(x){}
+ if(!tok){msg.textContent='Enter the admin token in "Administrator settings" first.';return}msg.textContent='Creating…';
+ const r=await fetch('/admin/consoles',{method:'POST',headers:{'content-type':'application/json','X-Admin-Token':tok},body:JSON.stringify({hospital_id:b.dataset.id,name:b.dataset.name,email:box.querySelector('.ce').value,phone:box.querySelector('.cp').value})});
+ const j=await r.json().catch(()=>({}));if(!r.ok){msg.textContent=r.status===403?'Wrong admin token.':(j.detail||'Could not create.');return}
+ msg.innerHTML=`Link for the hospital's staff (share it privately):<br><input readonly value="${esc(j.url)}" style="width:100%" onclick="this.select()">`});
+/* ---------- live map (Leaflet + LocationIQ tiles via the server proxy) ---------- */
+const CFG={tiles:false};let LM=null,LG=null,RG=null,RD=null,PV=null,AC=null,TL=null,PM=null,PR=null,MK={},SEEN=new Set(),mapSig='',routeCase=null,fitDone=false;
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function isDark(){const t=document.documentElement.getAttribute('data-theme');return t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches)}
+function setTiles(){if(!LM)return;if(TL)LM.removeLayer(TL);TL=L.tileLayer(`/tiles/${isDark()?'dark':'streets'}/{z}/{x}/{y}.png`,{maxZoom:18,attribution:'© LocationIQ · © OpenStreetMap contributors'}).addTo(LM)}
+function ensureMap(){if(LM)return true;if(!CFG.tiles||!window.L)return false;
+ $('map').innerHTML='<div id="lmap"></div><div class="lgd"><span><i style="background:var(--accent)"></i>patient</span><span><i style="background:var(--ok)"></i>eligible</span><span><i style="background:var(--warn)"></i>provisional</span><span><i style="background:var(--bad)"></i>excluded</span><span><u style="background:var(--accent)"></u>recommended route</span><span><u style="background:var(--ai);opacity:.6"></u>alternatives</span></div><div class="hint" id="mapNote">Click the map to move the patient.</div>';
+ LM=L.map('lmap',{zoomControl:true}).setView([12.9249,80.1],11);setTiles();LG=L.layerGroup().addTo(LM);RG=L.layerGroup().addTo(LM);
+ LM.on('click',e=>{if(RUNNING)return;F.loc='custom';F.source='MANUAL';F.acc=null;F.addr=null;$('lat').value=e.latlng.lat.toFixed(5);$('lng').value=e.latlng.lng.toFixed(5);drawLoc();save();previewPatient(true);reverseInfo(e.latlng.lat,e.latlng.lng)});
+ RD=L.layerGroup().addTo(LM);PV=L.layerGroup().addTo(LM);AC=L.layerGroup().addTo(LM);
+ {const el=document.createElement('div');el.className='mapstat';el.id='mapstat';el.hidden=true;LM.getContainer().appendChild(el);L.DomEvent.disableClickPropagation(el)}
+ return true}
+const patientIcon=()=>L.divIcon({className:'',html:'<div class="pm"><i></i></div>',iconSize:[24,24],iconAnchor:[12,12]});
+function setPatient(lat,lng){if(!LM||!isFinite(lat)||!isFinite(lng))return;if(PM)PM.setLatLng([lat,lng]);else PM=L.marker([lat,lng],{icon:patientIcon(),zIndexOffset:2000,keyboard:false}).addTo(LM).bindTooltip('Patient location')}
+function previewPatient(recentre,search=true){if(!ensureMap())return;const[lat,lng]=coords();setPatient(lat,lng);if(PR)LM.removeLayer(PR);
+ PR=L.circle([lat,lng],{radius:8000,color:cssv('--accent'),weight:1.5,dashArray:'5 6',fillColor:cssv('--accent'),fillOpacity:.04,interactive:false}).addTo(LM);
+ if(recentre||!fitDone)LM.setView([lat,lng],12);if(search&&!RUNNING)schedulePreviewSearch()}
+function revealFor(id,distKm,radiusKm){if(SEEN.has(id))return'';SEEN.add(id);const f=Math.min(1,Math.max(0,(distKm||0)/(radiusKm||8)));return` rev" style="animation-delay:${Math.round(f*1300)}ms`}
+function foundMarkers(layer,d,tip){(d.hospitals||[]).forEach(h=>{const dv=h.operating_status!=='OPERATIONAL';
+ const m=L.marker([h.lat,h.lng],{icon:L.divIcon({className:'',html:`<div class="hm FOUND${dv?' dv':''}${revealFor(h.id,h.distance_km,d.radius_km)}"></div>`,iconSize:[17,17],iconAnchor:[8,8]}),zIndexOffset:300}).addTo(layer);
+ m.bindTooltip(`<b>${esc(h.name)}</b><br>${h.distance_km} km${h.source==='osm'?' · real hospital':''}${dv?' · '+esc(h.operating_status):''}`,{direction:'top',offset:[0,-6]});
+ m.bindPopup(`<b>${esc(h.name)}</b><div class="hint">${h.distance_km} km away</div>${realInfo(h)}${consoleForm(h)}`,{maxWidth:300});MK[h.id]=m})}
+function renderFound(d){const sig='found:'+(d.hospitals||[]).length+':'+d.radius_km;if(sig===mapSig)return;mapSig=sig;LG.clearLayers();MK={};if(d.patient)setPatient(d.patient.lat,d.patient.lng);
+ const P=[d.patient.lat,d.patient.lng];L.circle(P,{radius:d.radius_km*1000,color:cssv('--accent'),weight:1.5,dashArray:'5 6',fillColor:cssv('--accent'),fillOpacity:.035,interactive:false}).addTo(LG);
+ foundMarkers(LG,d);if(!fitDone&&d.hospitals.length){LM.fitBounds([P,...d.hospitals.map(h=>[h.lat,h.lng])],{padding:[34,34],maxZoom:14});fitDone=true}}
+/* radar sweep: an expanding search ring with a rotating scan line */
+const easeOut=p=>1-Math.pow(1-p,3);
+function dest(lat,lng,brg,m){return[lat+m*Math.cos(brg)/111320,lng+m*Math.sin(brg)/(111320*Math.cos(lat*Math.PI/180))]}
+let RADAR=null;
+function radarStart(lat,lng,radiusM,dur=1500){radarStop();if(!LM||!RD||!isFinite(lat))return;const col=cssv('--accent'),t0=performance.now();
+ const ring=L.circle([lat,lng],{radius:1,color:col,weight:2.5,fillColor:col,fillOpacity:.08,interactive:false}).addTo(RD);
+ const pulse=L.circle([lat,lng],{radius:1,color:col,weight:1.5,fillOpacity:0,interactive:false}).addTo(RD);
+ const trail=[0,1,2,3].map(i=>L.polyline([],{color:col,weight:3.2-i*.6,opacity:.9-i*.22,interactive:false}).addTo(RD));
+ const R=RADAR={raf:0,stop:false,t0,dur};
+ const frame=now=>{if(R.stop)return;const el=now-t0,r=Math.max(1,radiusM*easeOut(Math.min(1,el/dur))),ph=(el%1000)/1000;ring.setRadius(r);pulse.setRadius(r*(1+ph*.16));pulse.setStyle({opacity:.55*(1-ph)});
+  const a=(el/1000)*Math.PI*1.9;trail.forEach((t,i)=>t.setLatLngs([[lat,lng],dest(lat,lng,a-i*.2,r)]));R.raf=requestAnimationFrame(frame)};R.raf=requestAnimationFrame(frame)}
+function radarStop(){if(RADAR){RADAR.stop=true;cancelAnimationFrame(RADAR.raf)}RADAR=null;if(RD)RD.clearLayers()}
+function radarStopSoon(){if(!RADAR)return;const R=RADAR,wait=Math.max(250,R.t0+R.dur+350-performance.now());setTimeout(()=>{if(RADAR===R)radarStop()},wait)}
+function showStatus(text,tone){const el=$('mapstat');if(!el)return;if(!text){el.hidden=true;return}el.hidden=false;el.className='mapstat '+tone;el.innerHTML=`<span class="sd"></span>${esc(text)}`}
+/* Phases can fly by in milliseconds; a small queue keeps each one readable (>=0.55 s) without holding back the final result. */
+let stQ=[],stBusy=false,stTimer=null;
+function statusPump(){const it=stQ.shift();if(!it){stBusy=false;return}stBusy=true;showStatus(it[0],it[1]);stTimer=setTimeout(statusPump,it[1]==='busy'?550:750)}
+function mapStatus(text,tone='busy'){if(!text){clearTimeout(stTimer);stQ=[];stBusy=false;showStatus('','');return}
+ stQ.push([text,tone]);if(stQ.length>4){const i=stQ.findIndex(x=>x[1]==='busy');if(i>=0&&i<stQ.length-1)stQ.splice(i,1)}if(!stBusy)statusPump()}
+function patientLL(){const d=S.trace&&S.trace.discovery;return d&&d.patient?[d.patient.lat,d.patient.lng]:coords()}
+function mapPhase(ev){if(!ensureMap())return;const t=ev.type;
+ if(t==='stage_start'){const s=ev.stage,[lat,lng]=patientLL();
+  if(s==='FACILITY_DISCOVERY'){radarStart(lat,lng,8000);mapStatus('Searching for hospitals within 8 km…')}
+  else if(s==='DISCOVERY_WIDEN'){radarStart(lat,lng,25000,1900);mapStatus('Too few eligible hospitals nearby: widening the search to 25 km…','warn')}
+  else{const m={INTAKE:'Reading the report…',TRIAGE:'Assessing urgency…',ETA_ROUTING:'Calculating road travel times…',RESOURCE_INTERPRETATION:'Fetching bed and equipment availability…',ELIGIBILITY:'Checking required capabilities…',RANKING:'Ranking the hospitals…',ADVISOR:'Getting a second opinion…',EXPLANATION:'Writing the explanation…'}[s];if(m)mapStatus(m)}}
+ else if(t==='trace'&&ev.key==='discovery'){radarStopSoon();mapStatus(`Found ${ev.data.count} hospitals within ${ev.data.radius_km} km${ev.data.widened_from?' (widened)':''}`,'ok')}
+ else if(t==='trace'&&ev.key==='eligibility'){const c=ev.data.candidates,ok=c.filter(x=>x.status!=='REJECTED').length;mapStatus(`${ok} of ${c.length} hospitals can treat this patient`,ok?'ok':'bad')}
+ else if(t==='result'){const R=ev.data.recommendation;if(R)mapStatus(`Recommended: ${R.primary.name} · ETA ${R.primary.eta_min??'?'} min`,'ok');else mapStatus('No safe automated recommendation: operator handoff','bad');radarStop()}}
+/* current location (browser GPS) */
+function locInfo(text){$('locInfo').textContent=text||''}
+async function reverseInfo(lat,lng){locInfo('Looking up the address…');try{const a=(await(await fetch(`/reverse?lat=${lat}&lng=${lng}`)).json()).address;if(a){F.addr=a;locInfo('📍 '+a+(F.acc?` (±${Math.round(F.acc)} m)`:''))}else locInfo(`📍 ${(+lat).toFixed(4)}, ${(+lng).toFixed(4)}`)}catch(e){locInfo('')}}
+function showAccuracy(lat,lng,acc){if(!AC)return;AC.clearLayers();if(acc)L.circle([lat,lng],{radius:Math.max(acc,5),color:cssv('--accent'),weight:1,fillColor:cssv('--accent'),fillOpacity:.12,interactive:false}).addTo(AC)}
+function useMyLocation(){const b=$('gps');
+ if(!window.isSecureContext||!navigator.geolocation){locInfo('This browser cannot share its location here. Search an address or click the map instead.');return}
+ b.disabled=true;b.classList.add('loading');b.textContent='📍 Locating…';locInfo('Waiting for the browser to share your location…');mapStatus('Locating you…');
+ navigator.geolocation.getCurrentPosition(pos=>{b.disabled=false;b.classList.remove('loading');b.textContent='📍 Use my current location';
+  const{latitude:lat,longitude:lng,accuracy}=pos.coords;F.loc='custom';F.source='GPS';F.acc=Math.round(accuracy);F.addr=null;$('lat').value=lat.toFixed(5);$('lng').value=lng.toFixed(5);drawLoc();save();
+  if(!ensureMap())return;previewPatient(true);showAccuracy(lat,lng,accuracy);mapStatus(`Located you (accurate to about ${Math.round(accuracy)} m)`,'ok');reverseInfo(lat,lng)},
+ err=>{b.disabled=false;b.classList.remove('loading');b.textContent='📍 Use my current location';mapStatus('');
+  locInfo({1:'Location permission was denied. Allow it in the browser, or search an address / click the map.',2:'Your position is unavailable right now. Try again, or click the map.',3:'Locating timed out. Try again, or click the map.'}[err.code]||'Could not get your location.')},
+ {enableHighAccuracy:true,timeout:12000,maximumAge:15000})}
+/* live nearby search (before a case is run) */
+let psT=null,psSeq=0;
+function schedulePreviewSearch(){clearTimeout(psT);psT=setTimeout(previewSearch,500)}
+async function previewSearch(){if(!ensureMap()||RUNNING)return;const[lat,lng]=coords();if(!isFinite(lat)||!isFinite(lng))return;const seq=++psSeq;
+ PV.clearLayers();MK={};SEEN=new Set();radarStart(lat,lng,8000);mapStatus('Searching for hospitals within 8 km…');
+ let d;try{d=await(await fetch(`/nearby?lat=${lat}&lng=${lng}`)).json()}catch(e){d={ok:false}}if(seq!==psSeq||RUNNING)return;
+ if(!d.ok){radarStop();mapStatus('Hospital registry unavailable',  'bad');return}
+ if(d.radius_km>8)radarStart(lat,lng,d.radius_km*1000,1600);
+ foundMarkers(PV,{hospitals:d.hospitals,radius_km:d.radius_km});
+ const dv=d.hospitals.filter(h=>h.operating_status!=='OPERATIONAL').length;
+ if(d.hospitals.length){LM.fitBounds([[lat,lng],...d.hospitals.map(h=>[h.lat,h.lng])],{padding:[40,40],maxZoom:14})}
+ setTimeout(()=>{if(seq===psSeq&&!RUNNING){radarStop();mapStatus(d.hospitals.length?`${d.hospitals.length} hospitals within ${d.radius_km} km${dv?` · ${dv} not accepting`:''}${d.radius_km>8?' (widened: few nearby)':''}`:'No hospitals found nearby',d.hospitals.length?'ok':'bad')}},1900)}
+function renderLeaflet(){const e=S.trace.eligibility,d=S.trace.discovery;if(!ensureMap())return false;if(!e&&d&&d.hospitals){renderFound(d);return true}if(!e||!d||!d.patient){return true}
+ const show=$('showRej').checked,rank={};(S.trace.ranking?S.trace.ranking.ranked:[]).forEach(r=>rank[r.id]=r.rank);
+ const sig=JSON.stringify([e.candidates.map(c=>[c.id,c.status]),Object.entries(rank),show,d.radius_km]);if(sig===mapSig)return true;mapSig=sig;
+ LG.clearLayers();MK={};if(PR){LM.removeLayer(PR);PR=null}setPatient(d.patient.lat,d.patient.lng);
+ const P=[d.patient.lat,d.patient.lng],ring=(km,dash)=>L.circle(P,{radius:km*1000,color:cssv('--accent'),weight:1.5,dashArray:dash,fillColor:cssv('--accent'),fillOpacity:.035,interactive:false}).addTo(LG);
+ ring(d.radius_km,'5 6');if(d.widened_from)ring(d.widened_from,'2 5');
+ const pts=[P];
+ e.candidates.filter(c=>c.lat!=null&&(show||c.status!=='REJECTED')).sort((a,b)=>(b.status==='REJECTED')-(a.status==='REJECTED')).forEach(c=>{const r=rank[c.id],top=r===1,ok=c.status!=='REJECTED';
+  const m=L.marker([c.lat,c.lng],{icon:L.divIcon({className:'',html:`<div class="hm ${c.status}${top?' top':''}${revealFor(c.id,c.distance_km,d.radius_km)}">${ok&&r&&r<=9?r:''}</div>`,iconSize:top?[36,36]:ok?[26,26]:[14,14],iconAnchor:top?[18,18]:ok?[13,13]:[7,7]}),zIndexOffset:top?1500:ok?800:0}).addTo(LG);
+  m.bindTooltip(`<b>${esc(c.name)}</b><br>${c.status}${r?' · rank '+r:''}<br>ETA ${c.eta_min??'?'} min${c.reason?'<br>'+esc(c.reason):''}`,{direction:'top',offset:[0,-8]});
+  m.bindPopup(`<b>${esc(c.name)}</b><div class="hint">${c.status}${c.reason?' — '+esc(c.reason):''}</div><div style="margin-top:4px">${Object.entries(c.checks).map(([k,v])=>`<span class="tag ${v}">${{PRESENT:'✓',ABSENT:'✗',UNKNOWN:'?'}[v]} ${esc(k)}</span>`).join('')}</div>${realInfo(c)}${consoleForm(c)}`,{maxWidth:300});
+  MK[c.id]=m;if(ok)pts.push([c.lat,c.lng])});
+ if(!fitDone&&pts.length>1){LM.fitBounds(pts,{padding:[34,34],maxZoom:14});fitDone=true}return true}
+async function drawRoutes(){const R=S.result&&S.result.recommendation,e=S.trace.eligibility,d=S.trace.discovery;if(!LM||!R||!e||!d)return;const token=S.result.case_id+'|'+(isDark()?'d':'l');if(routeCase===token)return;routeCase=token;RG.clearLayers();
+ const by=Object.fromEntries(e.candidates.map(c=>[c.id,c])),P=d.patient,list=[R.primary,...R.alternatives].slice(0,4);let bounds=[[P.lat,P.lng]];
+ for(let i=0;i<list.length;i++){const h=list[i],c=by[h.hospital_id];if(!c||c.lat==null)continue;$('mapNote').textContent=`Drawing road routes… ${i+1}/${list.length}`;
+  let j;try{j=await(await fetch(`/route?from_lat=${P.lat}&from_lng=${P.lng}&to_lat=${c.lat}&to_lng=${c.lng}`)).json()}catch(x){continue}if(!j.ok||routeCase!==token)continue;
+  const top=i===0;if(top)L.polyline(j.coords,{color:'#fff',weight:9,opacity:.85,interactive:false}).addTo(RG);
+  const pl=L.polyline(j.coords,{color:top?cssv('--accent'):cssv('--ai'),weight:top?5:3,opacity:top?.95:.6,dashArray:top?null:'7 8'}).addTo(RG);
+  pl.bindTooltip(`${top?'Recommended: ':'Alternative: '}${esc(h.name)}<br>${j.km} km · ${j.minutes} min by road`,{sticky:true});bounds=bounds.concat(j.coords);
+  if(top){LM.fitBounds(L.latLngBounds(bounds),{padding:[40,40],maxZoom:15});MK[h.hospital_id]&&MK[h.hospital_id].bringToFront&&0}}
+ if(routeCase===token){const j0=R.primary;$('mapNote').textContent=`Recommended: ${j0.name} · road route drawn. Click a hospital for its capability checks; click the map to move the patient.`}}
+function renderMap(){if(CFG.tiles&&window.L){if(renderLeaflet())return}renderSvgMap()}
+async function loadConfig(){try{CFG.tiles=(await(await fetch('/config')).json()).tiles}catch(e){}if(CFG.tiles&&window.L&&ensureMap())previewPatient(true)}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{setTiles();routeCase=null;drawRoutes()});
+/* ---------- events ---------- */
+function repaint(){renderBeds();nodeState();renderKPIs();renderWaterfall();renderDetail();renderMap()}
+function handle(ev){
+ mapPhase(ev);
+ if(ev.type==='stage_start'){S.running=S.running.filter(x=>x!==ev.stage).concat(ev.stage);if(S.follow&&LANE[ev.stage])S.sel=ev.stage}
+ else if(ev.type==='stage_end'){S.spans[ev.stage]=ev;S.running=S.running.filter(x=>x!==ev.stage);if(S.follow&&LANE[ev.stage])S.sel=ev.stage}
+ else if(ev.type==='trace'){S.trace[ev.key]=ev.data;if(ev.key==='llm')mapBadges();if(ev.key==='plan')renderPlan()}
+ else if(ev.type==='message'){onMessage(ev)}
+ else if(ev.type==='result'){S.result=ev.data;S.trace=ev.data.trace;ev.data.timeline.forEach(s=>S.spans[s.stage]=s);S.running=[];if(S.follow)S.sel=ev.data.halted?S.sel:'ENGINE';
+  $('totalChip').className='chip ok';$('totalChip').textContent='total '+fmt(ev.data.total_ms);document.getElementById('modeChip').dataset.set=1;showMode(ev.data);$('export').disabled=false;renderAlerts();renderReco();renderReport();setTimeout(drawRoutes,50);onCaseResult(ev.data);setTimeout(loadHistory,2500);mapSet('ORCH',ev.data.halted?'error':'done',ev.data.halted?'handoff to operator':'recommendation ready');mapBadges();renderPlan();$('replay').disabled=false}
+ else if(ev.type==='error'){$('alerts').innerHTML=`<div class="alert">${esc(ev.message)}</div>`}
+ repaint()}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function run(){clearInterval(dispTimer);DISP=null;CASE=null;$('dispatchCard').hidden=true;$('reportCard').hidden=true;RUNNING=true;clearTimeout(psT);psSeq++;mapStatus('');fresh();buildFlow();mapReset();mapSet('ORCH','working','running the case…');$('replay').disabled=true;$('reco').innerHTML='<div class="skel" style="margin:8px 0"></div><div class="skel" style="width:70%"></div>';if(LM){LG.clearLayers();RG.clearLayers();PV.clearLayers();radarStop();MK={};SEEN=new Set();mapSig='';routeCase=null;fitDone=false;previewPatient(true,false);$('mapNote').textContent='Working…'}else{$('map').innerHTML='<div class="skel" style="margin:8px 0"></div>'}$('wf').innerHTML='<div class="skel"></div>';$('det').innerHTML='<div class="skel"></div>';$('alerts').innerHTML='';
+ $('go').disabled=true;$('status').textContent='running…';$('totalChip').className='chip live';$('totalChip').textContent='running…';$('flowHint').textContent='live: the view follows the pipeline';renderKPIs();save();
+ try{const r=await fetch('/cases/stream',{method:'POST',headers:{'content-type':'application/json'},body:body()});if(!r.ok)throw new Error('HTTP '+r.status+' '+await r.text());
+  const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
+  while(true){const{done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
+   while((i=buf.indexOf('\n\n'))>=0){const line=buf.slice(0,i).replace(/^data: /,'');buf=buf.slice(i+2);if(!line.trim())continue;const ev=JSON.parse(line);handle(ev);if($('slow').checked&&ev.type!=='result')await sleep(400)}}
+  $('status').textContent='done · Ctrl+Enter to run again';
+ }catch(e){$('status').textContent='Error: '+e.message;$('alerts').innerHTML=`<div class="alert"><b>Could not run the pipeline.</b> ${esc(e.message)}<div class="hint">Is the API running on this port, and the resource service on :8000?</div></div>`;$('totalChip').className='chip';$('totalChip').textContent='failed'}
+ finally{RUNNING=false;$('go').disabled=false;loadStats();loadProviders()}}
+async function bench(){$('bench').disabled=true;$('go').disabled=true;const t=[];try{for(let i=1;i<=10;i++){$('status').textContent=`benchmark ${i}/10…`;const t0=performance.now();const r=await fetch('/cases',{method:'POST',headers:{'content-type':'application/json'},body:body()});if(!r.ok)throw new Error('HTTP '+r.status);t.push(performance.now()-t0)}
+ t.sort((a,b)=>a-b);$('status').textContent=`10 runs · browser round-trip median ${fmt(t[4])}, max ${fmt(t[9])}`}catch(e){$('status').textContent='Error: '+e.message}
+ $('bench').disabled=false;$('go').disabled=false;loadStats()}
+const adminTok=()=>{let t='';try{t=sessionStorage.getItem('cedcs_admin')||''}catch(x){}return t||($('adminTok')?$('adminTok').value:'')};
+const fmtT=t=>new Date(t*1000).toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+async function loadHistory(){const note=$('histNote'),list=$('histList');
+ try{const st=await(await fetch('/history/status')).json();$('histWhere').textContent=st.enabled?('stored in '+st.backend+' · '+(st.stored_runs??'?')+' runs'):'history off'}catch(e){}
+ const tok=adminTok();if(!tok){note.textContent='Every run is saved with its full report and timings. Enter the admin token (Administrator settings) to view them.';list.innerHTML='';return}
+ const r=await fetch('/history/runs?limit=40',{headers:{'X-Admin-Token':tok}});
+ if(!r.ok){note.textContent=r.status===403?'Wrong admin token.':'Could not load history.';list.innerHTML='';return}
+ const d=await r.json();note.textContent=d.runs.length?'Newest first. Click a row for its saved events; the link downloads the complete record (report, reasoning, timings).':'Nothing saved yet: run a case.';
+ list.innerHTML=d.runs.map(x=>`<div class="mrow hrow" data-id="${esc(x.case_id)}" style="grid-template-columns:118px 1fr 70px 56px;cursor:pointer"><span class="hint">${esc(fmtT(x.started_at))}</span><span>${x.halted?'<span class="st-FAILED">handoff</span> ':''}<b>${esc(x.priority||'?')}</b> → ${esc(x.primary_hospital||'—')}<div class="hint">${esc(x.mode||'')} · ${x.n_candidates} candidates · AI ${x.ai_ok} ok / ${x.ai_fallback} fallback${x.providers?' · '+esc(x.providers):''}${x.hospital_source?' · '+esc(x.hospital_source):''}</div></span><span class="num">${(x.total_ms/1000).toFixed(1)} s</span><a class="hint" href="#" data-dl="${esc(x.case_id)}">JSON</a></div>`).join('')}
+document.addEventListener('click',async e=>{const dl=e.target.closest('[data-dl]');
+ if(dl){e.preventDefault();e.stopPropagation();const r=await fetch('/history/runs/'+encodeURIComponent(dl.dataset.dl),{headers:{'X-Admin-Token':adminTok()}});if(!r.ok)return;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(await r.json(),null,2)],{type:'application/json'}));a.download='cedcs-run-'+dl.dataset.dl.slice(0,8)+'.json';a.click();URL.revokeObjectURL(a.href);return}
+ const row=e.target.closest('.hrow');if(!row)return;const r=await fetch('/history/events?limit=30&case_id='+encodeURIComponent(row.dataset.id),{headers:{'X-Admin-Token':adminTok()}});if(!r.ok)return;
+ const ev=(await r.json()).events;$('histEv').innerHTML=ev.length?'<b>Events for this run</b><br>'+ev.map(x=>`${esc(fmtT(x.ts))} · ${esc(x.kind.replace(/_/g,' '))}${x.hospital_id?' · '+esc(x.hospital_id):''}${x.detail&&x.detail.response?' · '+esc(x.detail.response):''}${x.detail&&x.detail.hospital?' · '+esc(x.detail.hospital):''}`).join('<br>'):'No dispatch or hospital events for this run.'});
+$('histRefresh').onclick=loadHistory;
+async function loadStats(){try{const m=await(await fetch('/metrics')).json();if(!m.runs){$('stats').textContent='No runs yet. Run a case or press ×10.';return}
+ const rows=Object.entries(m.stages).filter(([k])=>k!=='PIPELINE').sort((a,b)=>b[1].p50_ms-a[1].p50_ms),max=Math.max(...rows.map(r=>r[1].p95_ms),.01);
+ $('stats').innerHTML=`<div style="margin-bottom:8px;font-size:13px;color:var(--ink)"><b>${m.runs}</b> runs · total p50 <b>${fmt(m.total.p50_ms)}</b> · p95 <b>${fmt(m.total.p95_ms)}</b> · max ${fmt(m.total.max_ms)}</div>
+ <div class="wfrow head"><span>Step</span><span>p50 (solid) · p95 (faded)</span><span class="num">p50</span><span class="num">p95</span></div>`+rows.map(([k,s])=>{const c=PARENT.has(k)?'par-c':(LANE[k]||'par')+'-c';return `<div class="wfrow"><span>${esc(LABEL[k]||k)}</span><div class="wfbar"><i class="${c}" style="left:0;width:${s.p95_ms/max*100}%;opacity:.3"></i><i class="${c}" style="left:0;width:${s.p50_ms/max*100}%"></i></div><span class="num">${fmt(s.p50_ms)}</span><span class="num">${fmt(s.p95_ms)}</span></div>`}).join('')}catch(e){$('stats').textContent='Metrics unavailable.'}}
+$('f').onsubmit=e=>{e.preventDefault();run()};$('replay').onclick=replay;$('gps').onclick=useMyLocation;$('bench').onclick=bench;$('reset').onclick=async()=>{await fetch('/metrics',{method:'DELETE'});loadStats()};
+$('export').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S.result,null,2)],{type:'application/json'}));a.download='cedcs-run-'+(S.result.case_id||'case').slice(0,8)+'.json';a.click()};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&!$('go').disabled)run()});
+let TH='auto';try{TH=localStorage.getItem('cedcs_theme')||'auto'}catch(e){}
+function applyTheme(t){const r=document.documentElement;if(t==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',t);$('theme').textContent={auto:'◐ Auto',light:'☀ Light',dark:'☾ Dark'}[t];if(LM){setTiles();routeCase=null;mapSig='';renderMap();drawRoutes()}}
+$('theme').onclick=()=>{TH={auto:'light',light:'dark',dark:'auto'}[TH];try{localStorage.setItem('cedcs_theme',TH)}catch(e){}applyTheme(TH)};applyTheme(TH);
+/* ---------- settings, bed checker, contacts, admin ---------- */
+let SET={bed_checker_enabled:false,allow_user_toggle:true,auto_dispatch:false,auto_escalate:true,ack_timeout_s:120,mail:{mode:'outbox',label:''}},CONTACTS=[];
+async function loadSettings(){try{SET=await(await fetch('/settings')).json()}catch(e){}renderAutomation()}
+function renderAutomation(){const cb=$('bedcheck'),h=$('bedHint');
+ if(SET.bed_checker_enabled){cb.checked=true;cb.disabled=true;h.textContent='on: enabled by the administrator'}
+ else if(!SET.allow_user_toggle){cb.checked=false;cb.disabled=true;h.textContent='off: not allowed for users'}
+ else{cb.disabled=false;try{if(!cb.dataset.init){cb.checked=localStorage.getItem('cedcs_bed')==='1';cb.dataset.init='1'}}catch(e){}h.textContent=cb.checked?'on for the next case':'off (manual)'}
+ const real=SET.hospital_source_effective==='real';$('srcChip').textContent=real?'🏥 real hospitals · OpenStreetMap':'🧪 synthetic demo hospitals';$('srcChip').className='chip '+(real?'ok':'live');
+ $('subSrc').textContent=real?'real hospitals from OpenStreetMap; beds and facilities shown only when a hospital reports them':'SYNTHETIC hospitals and capacity (demo data)';
+ if(SET.hospital_source==='real'&&!SET.real_hospitals_available)$('subSrc').textContent='synthetic demo hospitals (real hospitals need a map-data key)';
+ const m=SET.mail||{};$('mailMode').textContent=m.label||'';$('mailMode').className='badge '+(m.mode==='smtp'?'st-FAILED':'st-LOGGED');
+ $('dispMode').textContent=m.label||'';$('dispMode').className='badge '+(m.mode==='smtp'?'st-FAILED':'st-LOGGED');
+ const set=(id,v)=>{const el=$(id);if(el&&document.activeElement!==el){if(el.type==='checkbox')el.checked=!!v;else el.value=v}};set('a_src',SET.hospital_source);set('a_bed',SET.bed_checker_enabled);set('a_user',SET.allow_user_toggle);set('a_auto',SET.auto_dispatch);set('a_esc',SET.auto_escalate);set('a_to',SET.ack_timeout_s)}
+$('bedcheck').onchange=()=>{try{localStorage.setItem('cedcs_bed',$('bedcheck').checked?'1':'0')}catch(e){}renderAutomation()};
+try{$('adminTok').value=sessionStorage.getItem('cedcs_admin')||''}catch(e){}
+$('adminApply').onclick=async()=>{const tok=$('adminTok').value.trim();try{sessionStorage.setItem('cedcs_admin',tok)}catch(e){}
+ const r=await fetch('/settings',{method:'PUT',headers:{'content-type':'application/json','X-Admin-Token':tok},body:JSON.stringify({hospital_source:$('a_src').value,bed_checker_enabled:$('a_bed').checked,allow_user_toggle:$('a_user').checked,auto_dispatch:$('a_auto').checked,auto_escalate:$('a_esc').checked,ack_timeout_s:+$('a_to').value||120})});
+ $('adminMsg').textContent=r.ok?'Saved.':r.status===403?'Wrong admin token.':'Could not save.';if(r.ok)loadSettings()};
+async function loadContacts(){try{CONTACTS=(await(await fetch('/contacts')).json()).contacts}catch(e){}
+ $('contacts').innerHTML=CONTACTS.length?CONTACTS.map(c=>`<div class="contact"><span><b>${esc(c.name)}</b> <span class="hint">${esc(c.relation||'')}<br>${esc(c.email)}</span></span><button class="x" data-id="${esc(c.id)}" title="Remove" type="button">✕</button></div>`).join(''):'<div class="hint">No contacts yet. Add one to notify family.</div>';
+ $('contacts').querySelectorAll('.x').forEach(b=>b.onclick=async()=>{await fetch('/contacts/'+b.dataset.id,{method:'DELETE'});loadContacts()})}
+$('c_add').onclick=async()=>{const r=await fetch('/contacts',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:$('c_name').value,email:$('c_email').value,relation:$('c_rel').value})});
+ if(r.ok){$('c_name').value=$('c_email').value=$('c_rel').value='';$('c_msg').textContent='Added.';loadContacts()}else{const j=await r.json().catch(()=>({}));$('c_msg').textContent=j.detail||'Could not add.'}};
+/* ---------- bed availability card ---------- */
+const BEDCOLS=[['icu_beds','ICU'],['emergency_beds','ER'],['general_beds','General'],['hdu_beds','HDU'],['pediatric_beds','Paeds'],['ventilators','Vent']];
+function bedCell(b){if(!b||b.available==null)return'<td class="b bq" title="not reported">–</td>';const c=b.available<=0?'b0':b.available<3?'b1':'b3';return`<td class="b ${c}" title="${b.total!=null?b.available+' of '+b.total+' free':''}${b.updated_at?' · updated '+new Date(b.updated_at).toLocaleTimeString():''}">${b.available}${b.total!=null?'<span class="hint">/'+b.total+'</span>':''}</td>`}
+function renderBeds(){const t=S.trace,bc=t.bed_check,card=$('bedCard');if(!bc){card.hidden=true;return}card.hidden=false;const b=t.beds;
+ if(!bc.active){$('bedMeta').textContent='off';$('beds').innerHTML=`<div class="banner"><span>🛏</span><div><b>Bed checker is off.</b><div class="hint">${esc(bc.blocked||'It only runs when you switch it on (the 🛏 toggle in the form) or an administrator enables it. When on, it scans nearby hospitals for live bed availability and makes beds the largest ranking metric.')}</div></div></div>`;return}
+ if(!b){$('bedMeta').textContent='scanning…';$('beds').innerHTML='<div class="skel"></div>';return}
+ if(b.error){$('bedMeta').textContent='scan failed';$('beds').innerHTML=`<div class="banner bad"><div><b>Live scan failed; last known beds were used.</b><div class="hint">${esc(b.error)}</div></div></div>`;return}
+ const rank={};((t.ranking||{}).ranked||[]).forEach(r=>rank[r.id]=r.rank);const need=new Set([...(t.triage?t.triage.required.concat(t.triage.preferred):[])]);const relKeys=new Set(['emergency_beds',...(need.has('ICU')?['icu_beds']:[]),...(need.has('VENTILATOR')?['ventilators']:[]),...(need.has('HDU')?['hdu_beds']:[]),...(need.has('GENERAL_BED')?['general_beds']:[]),...(need.has('PEDIATRIC_BED')?['pediatric_beds']:[])]);
+ const rows=b.hospitals.slice().sort((x,y)=>(rank[x.id]||99)-(rank[y.id]||99));
+ const reported=b.hospitals.filter(h=>Object.values(h.beds).some(x=>x.available!=null)).length,real=t.discovery&&t.discovery.source==='osm';
+ $('bedMeta').textContent=`${reported} of ${b.hospitals.length} hospitals report beds · scanned ${new Date(b.scanned_at).toLocaleTimeString()} in ${fmt(b.took_ms)} · switched on by ${bc.by}`;
+ $('beds').innerHTML=`${real?`<div class="banner ${reported?'':'warn'}" style="margin-bottom:8px"><div><b>${reported?reported+' of '+b.hospitals.length+' hospitals have reported their beds.':'No hospital here has reported its beds yet.'}</b><div class="hint">These are real hospitals; nothing is known about their capacity unless their staff report it through a hospital console link (an administrator creates one from the hospital's map marker). A dash means <b>not reported</b>, and scores zero on this metric: it is not treated as “no beds”.</div></div></div>`:'<div class="hint" style="margin-bottom:6px"><b>Simulated network:</b> these bed numbers are synthetic demo data.</div>'}<div class="hint" style="margin-bottom:6px">Highlighted columns are what this patient needs; free beds are the <b>largest single ranking weight (35%)</b> while the checker is on.</div>
+ <div class="scroll"><table class="bt"><tr><th>#</th><th>Hospital</th>${BEDCOLS.map(([k,l])=>`<th class="${relKeys.has(k)?'rel':''}">${l}</th>`).join('')}</tr>`+
+ rows.map(h=>`<tr><td>${rank[h.id]||'–'}</td><td>${esc(h.name)}</td>${BEDCOLS.map(([k])=>bedCell(h.beds[k])).join('')}</tr>`).join('')+'</table></div>'}
+/* ---------- emergency dispatch ---------- */
+let CASE=null,DISP=null,PREV=null,dispTimer=null,dispNote='';
+const st=(t,x)=>`<span class="badge st-${esc(x)}">${esc(t||x)}</span>`;
+function busMsg(frm,to,kind,label){const last=S.msgs.length?S.msgs[S.msgs.length-1].t_ms:0;onMessage({type:'message',from:frm,to,kind,label,t_ms:last+1})}
+function onCaseResult(d){CASE=d;DISP=null;PREV=null;clearInterval(dispTimer);$('dispatchCard').hidden=!d.recommendation;renderBeds();
+ const ad=d.trace&&d.trace.auto_dispatch;if(ad&&ad.dispatch_id)loadDispatch(ad.dispatch_id);else renderDispatch()}
+async function loadDispatch(id){try{DISP=await(await fetch('/dispatch/'+id)).json()}catch(e){return}renderDispatch();clearInterval(dispTimer);dispTimer=setInterval(async()=>{if(!DISP)return;try{const n=await(await fetch('/dispatch/'+DISP.id)).json();
+  const before=DISP.messages.filter(m=>m.ack).length,after=n.messages.filter(m=>m.ack).length;DISP=n;if(after>before){const m=n.messages.filter(m=>m.ack).slice(-1)[0];busMsg('DISPATCH','ORCH',m.ack.response==='ACCEPTED'?'result':'error',`${m.to_name} ${m.ack.response.toLowerCase()}`)}renderDispatch()}catch(e){}},2500)}
+function renderDispatch(){const el=$('disp');if(!CASE||!CASE.recommendation){el.innerHTML='';return}
+ if(!DISP){const R=CASE.recommendation,h=R.primary,n=CONTACTS.length;
+  el.innerHTML=`<p style="margin:0 0 8px">Alert <b>${n?n+' family contact'+(n>1?'s':''):'no family contacts (add some in the sidebar)'}</b>, the recommended hospital <b>${esc(h.name)}</b> and the nearest ambulance, sharing the patient's GPS location and condition.${(SET.auto_dispatch?' <span class="hint">Auto-dispatch is on, but this case was not urgent enough to trigger it.</span>':'')}</p>
+  <div class="dbtns"><button class="btn ghost sm" id="dPrev" type="button">Preview the emails</button><button class="btn sm" id="dSend" type="button">Send emergency alerts…</button></div><div id="dPrevBox"></div>`;
+  $('dPrev').onclick=previewDispatch;$('dSend').onclick=askSend;if(PREV)showPreview();return}
+ const D=DISP,hosp=D.messages.filter(m=>m.kind==='HOSPITAL'),tone={CONFIRMED:'ok',AWAITING_CONFIRMATION:'warn',AWAITING_NEXT:'warn',NO_MORE_HOSPITALS:'bad'}[D.status]||'';
+ const cur=hosp.filter(m=>!m.acks.length).slice(-1)[0],acc=hosp.find(m=>m.ack&&m.ack.response==='ACCEPTED');
+ const title={CONFIRMED:`✅ ${acc?esc(acc.to_name):'A hospital'} confirmed and a bed is being held`,AWAITING_CONFIRMATION:`⏳ Waiting for ${cur?esc(cur.to_name):'a hospital'} to confirm`,AWAITING_NEXT:'Declined: waiting to notify the next hospital',NO_MORE_HOSPITALS:'⚠ No hospital accepted: a human operator must take over'}[D.status]||D.status;
+ const left=cur&&cur.seconds_waiting!=null?Math.max(0,D.ack_timeout_s-cur.seconds_waiting):null;
+ el.innerHTML=`<div class="banner ${tone}"><div><b>${title}</b><div class="hint">${left!=null?(left>0?`Auto-escalates to the next hospital in ${left}s if there is no answer`:'No answer in time: escalating…'):''}${D.mail?' · '+esc(D.mail.label):''}</div></div></div>
+ <div class="scroll" style="max-height:340px">`+D.messages.map(m=>{const sandbox=m.actual_to&&m.actual_to!==m.to_email;const ack=m.ack?`${st(m.ack.response,m.ack.response)} <span class="hint">${esc(m.ack.source)}${m.ack.eta_min!=null?' · ETA '+m.ack.eta_min+' min':''}${m.ack.note?' · “'+esc(m.ack.note)+'”':''}${m.ack.beds&&m.ack.beds.ok?` · bed ${esc(m.ack.beds.bed_key.replace('_beds',''))} ${m.ack.beds.before}→${m.ack.beds.after}`:''}</span>`:(m.kind==='HOSPITAL'?'<span class="hint">awaiting confirmation…</span>':'<span class="hint">—</span>');
+  const sim=m.kind==='HOSPITAL'&&!m.ack&&(D.mail&&D.mail.mode==='outbox')?`<div class="dbtns"><button class="btn ghost sm sim" data-m="${esc(m.id)}" data-r="accept" type="button">Simulate: accept</button><button class="btn ghost sm sim" data-m="${esc(m.id)}" data-r="decline" type="button">Simulate: decline</button><a class="hint" target="_blank" href="${esc(m.ack_urls.page)}">open confirmation page ↗</a></div>`:'';
+  const hp=m.kind==='HOSPITAL'?((D.payload.snapshot.hospitals||[]).find(h=>h.id===m.hospital_id)||{}).phone:null;
+  const man=m.kind==='HOSPITAL'&&!m.ack&&(m.status==='NO_ADDRESS'||(D.mail&&D.mail.mode!=='outbox'))?`<div class="dbtns"><span class="hint">${hp?'📞 '+esc(hp)+' · ':''}record what they said:</span><button class="btn ghost sm man" data-m="${esc(m.id)}" data-r="accept" type="button">Accepted by phone</button><button class="btn ghost sm man" data-m="${esc(m.id)}" data-r="decline" type="button">Declined by phone</button></div>`:'';
+  const por=m.kind==='HOSPITAL'?`<div class="dbtns"><button class="btn ghost sm portal" data-h="${esc(m.hospital_id)}" type="button">Open this hospital's portal ↗</button><span class="hint pmsg"></span></div>`:'';
+  return`<div class="mrow"><b>${esc(m.kind.toLowerCase())}${m.kind==='AMBULANCE'?'<div class="hint">simulated</div>':''}</b><span>${esc(m.to_name)}<div class="hint">${esc(m.subject.replace(/\[CEDCS-ACK \w+\]/,'').slice(0,70))}</div><div class="hint">${m.to_email?esc(m.to_email):'<i>no address on file</i>'}${sandbox?' → '+esc(m.actual_to)+' (sandbox)':''}</div></span>${st(m.status,m.status)}<span>${ack}${m.error?'<div class="hint '+(m.status==='NO_ADDRESS'?'st-NO_ADDRESS':'st-FAILED')+'">'+esc(m.error)+'</div>':''}${por}${sim}${man}</span></div>`}).join('')+`</div>
+ <div class="dbtns"><button class="btn ghost sm" id="dEsc" type="button">Notify the next hospital now</button><button class="btn ghost sm" id="dOut" type="button">View outbox</button></div>
+ <div style="margin-top:10px"><label style="margin-top:0">Send a health/status update to family</label><div style="display:flex;gap:8px"><input id="dNote" placeholder="e.g. Now conscious and speaking; on the way to the hospital"><button class="btn sm" id="dUpd" type="button">Send update</button></div><div class="hint" id="dMsg">${esc(dispNote)}</div></div><div id="dOutBox"></div>`;
+ el.querySelectorAll('.sim').forEach(b=>b.onclick=async()=>{const r=await fetch(`/dispatch/${D.id}/simulate-ack`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message_id:b.dataset.m,response:b.dataset.r})});if(r.ok){DISP=(await r.json()).dispatch;busMsg('DISPATCH','ORCH',b.dataset.r==='accept'?'result':'error',`simulated hospital ${b.dataset.r}`);renderDispatch()}});
+ el.querySelectorAll('.portal').forEach(b=>b.onclick=async()=>{const msg=b.parentElement.querySelector('.pmsg');let tok='';try{tok=sessionStorage.getItem('cedcs_admin')||$('adminTok').value||''}catch(x){}
+  if(!tok){msg.textContent='Enter the admin token in "Administrator settings" first.';return}
+  const r=await fetch(`/dispatch/${D.id}/portal?hospital_id=${encodeURIComponent(b.dataset.h)}`,{method:'POST',headers:{'X-Admin-Token':tok}});const j=await r.json().catch(()=>({}));
+  if(!r.ok){msg.textContent=r.status===403?'Wrong admin token.':(j.detail||'Could not open.');return}window.open(j.url,'_blank','noopener')});
+ el.querySelectorAll('.man').forEach(b=>b.onclick=async()=>{const r=await fetch(`/dispatch/${D.id}/manual-ack`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message_id:b.dataset.m,response:b.dataset.r,note:'confirmed by phone'})});
+  if(r.ok){DISP=(await r.json()).dispatch;busMsg('DISPATCH','ORCH',b.dataset.r==='accept'?'result':'error',`phone answer: ${b.dataset.r}`);renderDispatch()}});
+ $('dEsc').onclick=async()=>{const r=await(await fetch(`/dispatch/${D.id}/escalate`,{method:'POST'})).json();DISP=r.dispatch;dispNote=r.notified?'Notified '+r.notified.name:'No more hospitals to notify';renderDispatch()};
+ $('dUpd').onclick=async()=>{const r=await fetch(`/dispatch/${D.id}/update`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({note:$('dNote').value})});if(r.ok){DISP=await r.json();busMsg('DISPATCH','ORCH','result','family update sent');dispNote='Update sent to family.';renderDispatch()}else{dispNote=(await r.json().catch(()=>({}))).detail||'Failed.';renderDispatch()}};
+ $('dOut').onclick=async()=>{const o=await(await fetch('/outbox')).json();$('dOutBox').innerHTML='<div class="scroll" style="max-height:200px;margin-top:8px">'+o.messages.map(m=>`<div class="mrow" style="grid-template-columns:70px 1fr 80px"><b>${esc(m.kind.toLowerCase())}</b><span>${esc(m.subject)}<div class="hint">to ${esc(m.actual_to||m.to_email)}</div></span>${st(m.status,m.status)}</div>`).join('')+'</div>'}}
+async function previewDispatch(){const r=await fetch('/dispatch/preview',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({case_id:CASE.case_id})});PREV=await r.json();showPreview()}
+function showPreview(){$('dPrevBox').innerHTML=`<div class="hint" style="margin:8px 0">${PREV.messages.length} message(s). Nothing has been sent. Nearest ambulance: ${PREV.ambulance?esc(PREV.ambulance.name)+' (~'+Math.round(PREV.ambulance.eta_min)+' min, '+PREV.ambulance.method+'; <b>simulated directory</b>)':'none available'}.</div>`+PREV.messages.map(m=>`<details style="margin:4px 0"><summary><b>${esc(m.kind.toLowerCase())}</b> to ${esc(m.to_name)}${m.to_email?'':' <span class="st-NO_ADDRESS">(no email on file: someone must phone them)</span>'} <span class="hint">${esc(m.subject)}</span></summary><pre class="pv">${esc(m.body_text)}</pre></details>`).join('')}
+function askSend(){const live=SET.mail&&SET.mail.mode==='smtp',n=CONTACTS.length;
+ $('confirmBody').innerHTML=`<p style="margin:0 0 6px">This alerts <b>${n} family contact${n===1?'':'s'}</b>, <b>${esc(CASE.recommendation.primary.name)}</b> and the nearest ambulance with the patient's location and condition.</p><div class="banner ${live?'bad':'ok'}"><div><b>${esc((SET.mail||{}).label||'')}</b></div></div>`;
+ $('confirmLiveRow').hidden=!live;$('confirmLive').checked=false;$('confirmSend').disabled=live;$('confirmDlg').showModal()}
+$('confirmLive').onchange=()=>{$('confirmSend').disabled=!$('confirmLive').checked};
+async function doSend(){dispNote='';busMsg('ORCH','DISPATCH','command','notify family, hospital and ambulance');
+ const r=await fetch('/dispatch',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({case_id:CASE.case_id,confirm:true})});
+ if(!r.ok){const j=await r.json().catch(()=>({}));busMsg('DISPATCH','ORCH','error','dispatch failed');$('disp').insertAdjacentHTML('afterbegin',`<div class="banner bad"><b>${esc(j.detail||'Could not send.')}</b></div>`);return}
+ const d=await r.json();busMsg('DISPATCH','ORCH','result',`${d.messages.length} message(s) ${d.mode==='outbox'?'logged':'sent'}`);await loadDispatch(d.id)}
+/* the form's submit event (with the pressed button) is more reliable than the dialog's close event */
+$('confirmForm').addEventListener('submit',e=>{if(e.submitter&&e.submitter.value==='send')doSend()});
+/* ---------- AI providers panel ---------- */
+const PCOL={groq:'--ai',nvidia:'--ok'};
+async function loadProviders(){try{const s=await(await fetch('/llm/status')).json();
+ const card=p=>{const x=s.providers[p],cls=x.state==='healthy'?'st-SENT':x.configured?'st-QUEUED':'st-FAILED';
+  return`<div class="kpi" style="--tone:var(${PCOL[p]});min-height:0"><div class="k">${p==='groq'?'Groq':'NVIDIA'}</div><div class="v ${cls}" style="font-size:16px">${esc(x.state)}</div>
+  <div class="s">${x.configured?`${x.avg_ms!=null?'avg '+fmt(x.avg_ms)+' · ':''}${x.calls_last_min}/${x.limit_per_min} calls/min · ${x.ok} ok · ${x.failed} failed · ${x.rate_limited} rate-limited${x.retry_in_s?` · retry in ${x.retry_in_s}s`:''}${x.retired_models.length?`<br>retired: ${x.retired_models.map(m=>esc(m.split('/').pop())).join(', ')}`:''}${p==='groq'?'<br>tokens left: '+Object.entries(s.groq_budget).map(([m,v])=>esc(m.split('/').pop())+' '+v).join(' · '):''}`:'no API key set'}</div></div>`};
+ const chip=(e,i)=>{const[p,m]=[e.spec.split(':')[0],e.spec.split(':').slice(1).join(':')];return`<span class="tag" style="${i===0?'font-weight:700;':''}${e.usable?'':'opacity:.45;text-decoration:line-through'};border-color:color-mix(in srgb,var(${PCOL[p]}) 50%,var(--line))"><i class="dot" style="background:var(${PCOL[p]})"></i>${esc(m.split('/').pop())}</span>`};
+ $('prov').innerHTML=`<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-bottom:8px">${card('groq')}${card('nvidia')}</div>
+  <table><tr><th>Agent</th><th>Plan (first choice bold; struck through = unavailable right now)</th></tr>${Object.entries(s.plans).map(([st,pl])=>`<tr><td>${esc(st.toLowerCase())}</td><td>${pl.map(chip).join(' ')}</td></tr>`).join('')}</table>
+  <p class="hint">Each agent uses the first healthy model in its plan; on a rate limit, timeout or error it moves to the next, on the other provider if needed.</p>`}catch(e){$('prov').textContent='Provider status unavailable.'}}
+$('provRefresh').onclick=loadProviders;setInterval(()=>{if(!document.hidden)loadProviders()},15000);
+load();drawSeg();drawLoc();fresh();buildFlow();mapBuild();renderKPIs();loadStats();loadConfig();loadSettings();loadContacts();loadProviders();
+loadHistory();
+</script>
+</body></html>

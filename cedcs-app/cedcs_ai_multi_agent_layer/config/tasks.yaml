@@ -1,0 +1,237 @@
+---
+structured_intake_task:
+  description: |-
+    Process the following emergency report and produce a complete StructuredCase JSON object.
+
+    INPUT:
+    - Free-text emergency report: {emergency_report}
+    - Consciousness toggle: {consciousness}  (alert / confused / unresponsive / unknown)
+    - Breathing toggle: {breathing}  (normal / laboured / slow / absent / unknown)
+    - Bleeding toggle: {bleeding}  (none / mild / severe / unknown)
+    - Resolved location: lat={location_lat}, lng={location_lng}, address={location_address}, source={location_source}
+
+    INSTRUCTIONS:
+    Extract all available fields from the report: age, gender, consciousness (use toggle value), breathing (use toggle value), bleeding (use toggle value), pulse, spo2, bp, symptoms, onset_time, mechanism of injury, medical_history, medications, allergies, blood_group.
+
+    For field_confidence: assign 0.9+ if the reporter explicitly stated the value, 0.6 or below if inferred from context, 0.0 if absent.
+
+    For missing_fields: list all absent fields ranked by decision impact — fields that would change the capability requirement profile (e.g. consciousness, bleeding severity, known cardiac history) come before fields with lower impact (e.g. blood_group).
+
+    intake_completeness: float from 0.0 to 1.0 representing how complete the extraction is.
+
+    DO NOT assign a priority level. DO NOT name or suggest a hospital. DO NOT diagnose the patient.
+  expected_output: |-
+    A valid StructuredCase JSON object with the following structure:
+    {
+      "case_id": null,
+      "patient": {
+        "age": int or null,
+        "age_confidence": float,
+        "gender": str or null,
+        "consciousness": "alert"|"confused"|"unresponsive"|"unknown",
+        "breathing": "normal"|"laboured"|"slow"|"absent"|"unknown",
+        "bleeding": "none"|"mild"|"severe"|"unknown",
+        "pulse": float or null,
+        "spo2": float or null,
+        "bp": str or null,
+        "symptoms": [str],
+        "onset_time": str or null,
+        "medical_history": [str],
+        "medications": [str],
+        "allergies": [str],
+        "blood_group": str or null
+      },
+      "incident": {"mechanism": str or null, "location_description": str or null},
+      "location": {"lat": float, "lng": float, "address": str, "accuracy_m": float or null, "source": "GPS"|"GEOCODED"|"MANUAL"},
+      "attachments": [],
+      "missing_fields": [str],
+      "field_confidence": {"field_name": float},
+      "intake_completeness": float
+    }
+  agent: emergency_intake_specialist
+clarification_task:
+  description: |-
+    Review the StructuredCase from the intake step and generate follow-up questions for the caller.
+
+    Given the missing_fields list (already ranked by decision impact), produce at most 3 follow-up questions. Order them strictly by how much the answer would change the downstream capability requirement profile — not by field incompleteness.
+
+    Rules:
+    - Never ask for information whose answer would not change the required or preferred capability set
+    - Every question must be phrased so the caller can skip it by saying "don't know" — skipped answers are recorded as UNKNOWN, never as a negative finding
+    - Keep questions short, calm, and understandable by a non-medical bystander
+    - Do not ask compound questions (one fact per question)
+    - Do not ask about anything already captured with confidence >= 0.7
+
+    This task is for one clarification round. The orchestrator controls how many rounds run (max 2).
+  expected_output: |-
+    A JSON object with:
+    {
+      "questions": [
+        {
+          "field": "field_name_being_clarified",
+          "question": "Plain language question text",
+          "impact": "Brief explanation of how the answer changes the capability requirement"
+        }
+      ],
+      "round_rationale": "Why these specific fields were prioritised over others in missing_fields"
+    }
+    Maximum 3 items in the questions array. If missing_fields is empty or all remaining gaps have zero decision impact, return {"questions": [], "round_rationale": "No impactful missing fields remain."}
+  agent: clarification_specialist
+  context:
+  - structured_intake_task
+triage_assessment_task:
+  description: |-
+    Perform triage assessment on the structured case (incorporating any clarification answers) and produce a TriageResult.
+
+    Use the StructuredCase from intake and any additional field values obtained during clarification. Assess urgency and required care capabilities.
+
+    CRITICAL RULES — violations will be caught and flagged by a downstream filter:
+    1. NEVER state a diagnosis, condition name, or disease in your rationale or category_set. Do not write "heart attack", "stroke", "MI", "infarction", "sepsis", "appendicitis", or any other named condition assertively.
+    2. Express rationale ONLY in terms of: vital sign patterns, urgency level, and required care capabilities (e.g. "fast and shallow breathing with altered consciousness requires immediate respiratory and neurological monitoring capability").
+    3. category_set must contain capability category labels (CARDIAC, NEUROLOGICAL, TRAUMA, RESPIRATORY, OBSTETRIC, PAEDIATRIC, BURNS, TOXICOLOGY, RENAL, PSYCHIATRIC) — never diagnosis names.
+    4. When genuinely ambiguous between two capability profiles, include both categories — do not force a single guess.
+    5. required_capabilities and preferred_capabilities must use ONLY keys from this closed vocabulary (anything else cannot be checked and is ignored): EMERGENCY_DEPARTMENT, CARDIOLOGY, NEUROLOGY, TRAUMA, TRAUMA_BAY, ORTHOPEDICS, PEDIATRICS, OBSTETRICS, ONCOLOGY, NEPHROLOGY, GENERAL_MEDICINE, ICU, GENERAL_BED, EMERGENCY_BED, HDU, PEDIATRIC_BED, VENTILATOR, CT_SCAN, MRI, X_RAY, USG, CATH_LAB, OT, LAB, DIALYSIS, CARDIAC_MONITORING, BLOOD_BANK.
+    6. triage_confidence must reflect genuine uncertainty — do not overstate confidence when vitals are incomplete.
+  expected_output: |-
+    A valid TriageResult JSON object:
+    {
+      "priority": "CRITICAL"|"HIGH"|"MODERATE"|"LOW",
+      "category_set": ["CAPABILITY_CATEGORY", ...],
+      "required_capabilities": ["CAPABILITY_KEY", ...],
+      "preferred_capabilities": ["CAPABILITY_KEY", ...],
+      "triage_confidence": float (0.0 to 1.0),
+      "rationale": "Explanation in capability and urgency terms only — no diagnosis names"
+    }
+  agent: emergency_triage_assessor
+  context:
+  - structured_intake_task
+  - clarification_task
+facility_discovery_task:
+  description: |-
+    Discover all candidate hospitals reachable from the patient's location using the triage result's capability hint.
+
+    Patient location: lat={location_lat}, lng={location_lng}
+
+    STEP 1 — Determine radius:
+    - Use PlacesNearbyTool with radius_m=8000 first. Count results. If fewer than 3 hospitals are found, switch to radius_m=25000 (rural mode).
+
+    STEP 2 — Retrieve Places:
+    - Call PlacesNearbyTool with the chosen radius. Collect all returned places.
+
+    STEP 3 — Registry join:
+    - Call FacilityRegistryLookupTool with the lat/lng and chosen radius_km (8 or 25) to get CEDCS hospital records including hospital_id, capabilities, and seed_eta_min.
+    - Join by place_id where available. For registry records without a matching place_id from Maps, include them anyway.
+    - If PlacesNearbyTool is unavailable or returns an error/nothing (e.g. no Maps key), use the FacilityRegistryLookupTool radius search alone as the candidate source. Do not stop.
+    - Copy name, operating_status and ipd_accepting straight from the registry record, unfiltered and unmodified. Do not drop DIVERTING/CLOSED facilities or non-accepting ones — eligibility decides that downstream.
+
+    STEP 4 — ETA assignment:
+    - For each candidate, assign eta_source_tier:
+      - Tier 5 (seed): use seed_eta_min from registry if no better source available. eta_confidence=0.25
+      - Tier 4 (haversine): if distance_km is known (the registry radius search returns distance_km) but no live ETA, estimate eta_min = (distance_km / 30) * 60 * 1.4. eta_confidence=0.40
+      - Higher tiers (1-3) are assigned by the orchestrator's DistanceMatrixTool call after this task.
+
+    STEP 5 — Output:
+    Return ALL discovered candidates. DO NOT filter by capability — that is eligibility's job downstream.
+  expected_output: |-
+    A JSON array of CandidateHospital objects:
+    [
+      {
+        "hospital_id": "str",
+        "name": "str",
+        "operating_status": "OPERATIONAL"|"DIVERTING"|"CLOSED",
+        "ipd_accepting": bool,
+        "place_id": "str or null",
+        "distance_km": float or null,
+        "eta_min": float or null,
+        "eta_source_tier": int (1-5),
+        "eta_confidence": float
+      },
+      ...
+    ]
+    Every entry must have eta_source_tier set. Return all candidates found — do not filter by capability match.
+  agent: facility_discovery_coordinator
+  context:
+  - triage_assessment_task
+resource_interpretation_task:
+  description: |-
+    Normalise the raw heterogeneous resource feeds for all candidate hospitals into canonical ResourceSnapshot objects.
+
+    STEP 1: Take the hospital_id of EVERY candidate from the facility discovery step and call ResourceSnapshotTool once with the full list. Do not drop any hospital.
+    STEP 2: Normalise the returned feeds. This data may contain records in different formats from different sources: hospital console systems, FHIR endpoints, government datasets, or seeded/simulated data.
+
+    For each hospital's raw feed, produce one ResourceSnapshot containing normalised ResourceRecord objects.
+
+    NORMALISATION RULES:
+    1. Keep resource_key exactly as returned when it is already canonical. The V1 canonical vocabulary is: department_<CODE>, general_beds, emergency_beds, icu_beds, hdu_beds, pediatric_beds, ventilators, equipment_<CODE>, specialist_<SPECIALTY>, blood_bank, opd, ipd_admission_delay_est_min. Only remap a key if it is clearly a variant of one of these (V1 has a single data source, so this is normally a pass-through). Never invent new keys.
+    2. Preserve the exact updated_at timestamp as given — never round, infer, or fabricate a timestamp
+    3. Preserve the exact source label from the feed — map to the nearest canonical source: HOSPITAL_CONSOLE, FHIR, GOVT, INFERRED, or SEED. If source is missing or unrecognisable, use SEED and note it in the record
+    4. Preserve reporter_id exactly as given; if absent, set to null — do not invent a reporter identity
+    5. Preserve value exactly as given (int, float, bool, string) — do not normalise units or convert values
+    6. Do NOT compute confidence scores, freshness ratings, or trust weights — those are computed by freshness.py downstream
+
+    IMPORTANT: Your job ends at shape normalisation. Do not filter, score, or rank hospitals based on their resources.
+  expected_output: |-
+    A JSON array of ResourceSnapshot objects, one per hospital:
+    [
+      {
+        "hospital_id": "str",
+        "records": [
+          {
+            "resource_key": "str (canonical key, e.g. icu_beds, ventilators, emergency_beds, blood_bank, specialist_CARDIOLOGY, equipment_CT_SCAN, department_TRAUMA)",
+            "value": "any JSON value exactly as received, e.g. {\"total\": 10, \"available\": 3} or {\"status\": \"on_call\"}",
+            "updated_at": "ISO datetime string exactly as received",
+            "source": "HOSPITAL_CONSOLE"|"FHIR"|"GOVT"|"INFERRED"|"SEED",
+            "reporter_id": "str or null"
+          }
+        ]
+      }
+    ]
+  agent: hospital_data_normaliser
+  context:
+  - facility_discovery_task
+explanation_task:
+  description: |-
+    Write a plain-language explanation of the validated recommendation that has been passed to you.
+
+    VALIDATED RECOMMENDATION INPUT:
+    {validated_recommendation}
+
+    This recommendation object is final, validated, and read-only. It was produced and verified by the deterministic decision engine (eligibility, ranking, engine.py) and has passed all 5 orchestrator validation checks.
+
+    Write an explanation covering all four sections below:
+
+    SECTION 1 — PRIMARY HOSPITAL:
+    Why was this hospital chosen as the primary destination? Mention the specific capabilities it satisfies, the ETA, and what the confidence level means practically.
+
+    SECTION 2 — ALTERNATIVES:
+    For each alternative hospital in the recommendation, explain why it ranks where it does relative to the primary (e.g. slightly longer ETA, fewer specialists confirmed, lower resource data freshness).
+
+    SECTION 3 — EXCLUDED HOSPITALS:
+    For each rejected hospital listed in the recommendation's rejection reasons, explain in plain language why it was excluded (e.g. "St. Mary's was excluded because its ICU was reported as full at the time of this assessment").
+
+    SECTION 4 — LIMITATIONS AND CAVEATS:
+    Translate any confidence caveats, ETA tier warnings, or data freshness limitations into practical terms for the family or operator (e.g. "The travel time estimate is approximate because live traffic data was unavailable — the actual journey may differ").
+
+    ABSOLUTE RULES:
+    - Do not reorder the hospitals
+    - Do not add a hospital that is not in the recommendation
+    - Do not remove or soften any rejection reason
+    - Do not introduce any new clinical judgement
+    - Do not express surprise or disagreement with the recommendation
+  expected_output: |-
+    A structured plain-language explanation in the following format:
+
+    **Recommended Destination:** [Hospital Name]
+    [Section 1 — Primary hospital explanation, 2-4 sentences]
+
+    **Alternatives:**
+    [For each alternative: name, ranking reason, 1-2 sentences]
+
+    **Why Nearby Hospitals Were Not Recommended:**
+    [For each rejected hospital: name, reason in plain language, 1 sentence]
+
+    **Important Limitations:**
+    [Confidence caveats and ETA tier warnings translated into plain language]
+  agent: recommendation_narrator
+  context:
+  - resource_interpretation_task

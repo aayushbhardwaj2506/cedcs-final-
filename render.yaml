@@ -1,0 +1,29 @@
+# Render Blueprint: deploys the CEDCS app (the cedcs-app/ folder) as one free web service.
+services:
+  - type: web
+    name: cedcs
+    runtime: python
+    plan: free
+    rootDir: cedcs-app
+    buildCommand: pip install -r requirements-deploy.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: ACCESS_PASSWORD      # the operator screen asks for this (user name: anything); generated, shown in the Render dashboard
+        generateValue: true
+      - key: ADMIN_TOKEN          # admin settings, hospital portal links, saved history; generated, shown in the dashboard
+        generateValue: true
+      - key: CEDCS_MODE
+        value: auto
+      - key: DISPATCH_MODE
+        value: outbox             # alerts are logged, nothing is e-mailed
+      - key: GROQ_API_KEY
+        sync: false
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: LOCATIONIQ_KEY
+        sync: false
+      - key: APP_DATABASE_URL     # a Neon Postgres URL: keeps contacts, dispatches, portal links and the saved run history
+        sync: false

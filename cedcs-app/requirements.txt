@@ -1,0 +1,8 @@
+pydantic>=2.9,<3
+pytest>=8.0
+crewai
+fastapi
+uvicorn[standard]
+psycopg2-binary
+requests
+httpx

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEDCS Analytics</title>
+<style>
+:root{color-scheme:light;
+ --bg:#f4f6fb;--card:#ffffff;--card2:#f8faff;--ink:#0f172a;--mute:#5b6785;--line:#e2e8f3;--barbg:#eaeff8;
+ --accent:#2563eb;--ok:#0f9d6b;--warn:#d97706;--bad:#e11d48;--ai:#7c3aed;--core:#0d9488;
+ --shadow:0 1px 2px rgba(15,23,42,.05),0 8px 24px rgba(37,99,235,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;
+ --bg:#0a0e17;--card:#111827;--card2:#151d2f;--ink:#e6ebf5;--mute:#8a96b0;--line:#222c42;--barbg:#1a2338;
+ --accent:#5b9bff;--ok:#34d399;--warn:#fbbf24;--bad:#fb7185;--ai:#b39cff;--core:#2dd4bf;
+ --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.25)}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 20px;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--core));display:grid;place-items:center;color:#fff;font-weight:800}
+.top h1{font-size:16px;margin:0}.sp{flex:1}.sub{color:var(--mute);font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12px;white-space:nowrap}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:7px 13px;cursor:pointer;font-weight:600;text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line);font-weight:500}.btn.sm{padding:3px 10px;font-size:12px}
+input,select{padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+main{max-width:1280px;margin:0 auto;padding:16px 20px 60px}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow);min-width:0}
+.card>h2{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card>h2 .r{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:400}
+.sec{margin:26px 2px 10px;font-size:15px;font-weight:700}.sec small{color:var(--mute);font-weight:400;margin-left:8px}
+.kpi .v{font-size:26px;font-weight:700;line-height:1.1}.kpi .l{color:var(--mute);font-size:12px;margin-top:2px}.kpi .s{color:var(--mute);font-size:12px}
+.hint{color:var(--mute);font-size:12px}.num{font-variant-numeric:tabular-nums}
+.bar{display:grid;grid-template-columns:150px 1fr 150px;gap:8px;align-items:center;margin:5px 0}.bar .t{height:12px;background:var(--barbg);border-radius:6px;position:relative;overflow:hidden}
+.bar .t i{position:absolute;left:0;top:0;bottom:0;border-radius:6px}.bar .t u{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);opacity:.55}
+.bar .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--mute)}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{color:var(--mute);font-weight:600;font-size:12px;position:sticky;top:0;background:var(--card)}
+.scroll{overflow:auto;max-height:420px}.empty{padding:34px;text-align:center;color:var(--mute)}
+.CRITICAL{color:var(--bad);font-weight:600}.HIGH{color:var(--warn);font-weight:600}.MODERATE{color:var(--accent)}.LOW{color:var(--ok)}
+pre{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;font:12px/1.5 ui-monospace,Consolas,monospace;margin:8px 0 0}
+svg text{fill:var(--mute);font-size:11px}
+.note{border-left:3px solid var(--warn);background:var(--card2);padding:8px 12px;border-radius:0 8px 8px 0;color:var(--mute);font-size:13px}
+@media(max-width:640px){.bar{grid-template-columns:100px 1fr 100px}.g2{grid-template-columns:1fr}}
+</style></head><body>
+<div class="top">
+ <div class="logo">C</div><h1>CEDCS Analytics</h1><span class="sub">saved runs · latency · AI · decisions · research data</span><span class="sp"></span>
+ <span class="chip" id="where">storage …</span>
+ <select id="win" aria-label="Time window"><option value="0">All saved runs</option><option value="1">Last 24 hours</option><option value="7">Last 7 days</option></select>
+ <input id="tok" type="password" placeholder="Admin token" autocomplete="off" style="width:140px" aria-label="Admin token">
+ <button class="btn sm" id="go" type="button">Load</button>
+ <a class="btn ghost sm" href="/">← Command view</a>
+</div>
+<main id="main"><div class="empty">Enter the admin token and press Load.</div></main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt=ms=>ms==null?'–':ms<1000?Math.round(ms)+' ms':(ms/1000).toFixed(ms<10000?2:1)+' s';
+const pc=x=>x==null?'–':(x*100).toFixed(0)+'%';
+const when=t=>new Date(t*1000).toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+const PRI={CRITICAL:'--bad',HIGH:'--warn',MODERATE:'--accent',LOW:'--ok'};
+const PROV={groq:'--accent',nvidia:'--core',fallback:'--warn'};
+let D=null;
+function tok(){try{return sessionStorage.getItem('cedcs_admin')||$('tok').value}catch(e){return $('tok').value}}
+try{const t=sessionStorage.getItem('cedcs_admin');if(t)$('tok').value=t}catch(e){}
+
+/* ---------- small chart helpers (inline SVG, no libraries) ---------- */
+function tile(v,l,s){return `<div class="card kpi"><div class="v num">${v}</div><div class="l">${l}</div><div class="s">${s||''}</div></div>`}
+function hbars(rows,color,fmtv){const mx=Math.max(...rows.map(r=>r.v),1e-9);
+ return rows.map(r=>`<div class="bar"><span class="n" title="${esc(r.l)}">${esc(r.l)}</span><div class="t"><i style="width:${r.v/mx*100}%;background:var(${r.c||color})"></i></div><span class="num hint">${fmtv?fmtv(r.v):r.v}${r.x?' · '+r.x:''}</span></div>`).join('')}
+function runChart(series,p50,p95){const W=760,H=230,L=46,B=26,T=10,R=8,n=series.length;if(!n)return'';
+ const mx=Math.max(...series.map(s=>s.ms||0),p95||0)*1.12||1,bw=Math.max(3,Math.min(26,(W-L-R)/n-3)),X=i=>L+(i+.5)*((W-L-R)/n),Y=v=>T+(H-T-B)*(1-v/mx);
+ const ticks=[0,.25,.5,.75,1].map(f=>{const v=mx*f;return`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${fmt(v)}</text>`}).join('');
+ const bars=series.map((s,i)=>`<rect x="${X(i)-bw/2}" y="${Y(s.ms||0)}" width="${bw}" height="${H-B-Y(s.ms||0)}" rx="2" fill="var(${PRI[s.priority]||'--accent'})" opacity="${s.halted?.35:.9}"><title>${esc(when(s.t))} · ${esc(s.priority||'?')} · ${fmt(s.ms)}${s.halted?' · handoff':''}</title></rect>`).join('');
+ const ref=(v,lab,dash)=>v?`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--ink)" stroke-dasharray="${dash}" opacity=".6"/><text x="${W-R}" y="${Y(v)-4}" text-anchor="end">${lab} ${fmt(v)}</text>`:'';
+ return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Total time of each run">${ticks}${bars}${ref(p50,'median','4 3')}${ref(p95,'p95','1 3')}
+  <text x="${L}" y="${H-8}">${esc(when(series[0].t))}</text><text x="${W-R}" y="${H-8}" text-anchor="end">${esc(when(series[n-1].t))}</text></svg>`}
+function histChart(bins){if(!bins.length)return'';const W=420,H=170,L=30,B=30,T=8,mx=Math.max(...bins.map(b=>b.count),1),bw=(W-L-6)/bins.length;
+ return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Distribution of total time">`+bins.map((b,i)=>{const h=(H-B-T)*b.count/mx;return`<rect x="${L+i*bw+1}" y="${H-B-h}" width="${bw-2}" height="${h}" rx="2" fill="var(--accent)" opacity=".85"><title>${fmt(b.lo)}–${fmt(b.hi)}: ${b.count} run(s)</title></rect>${b.count?`<text x="${L+i*bw+bw/2}" y="${H-B-h-3}" text-anchor="middle">${b.count}</text>`:''}`}).join('')+
+  `<text x="${L}" y="${H-10}">${fmt(bins[0].lo)}</text><text x="${W-6}" y="${H-10}" text-anchor="end">${fmt(bins[bins.length-1].hi)}</text></svg>`}
+function legend(items){return`<div class="legend">${items.map(([c,l])=>`<span><i style="background:var(${c})"></i>${esc(l)}</span>`).join('')}</div>`}
+
+/* ---------- render ---------- */
+function render(){const a=D,k=a.latency.total,d=a.decisions,ai=a.ai,dp=a.dispatch;
+ $('where').textContent='stored in '+a.storage.backend+' · '+a.storage.stored_runs+' runs';
+ if(!a.window.runs){$('main').innerHTML='<div class="empty">No runs saved in this window yet. Run a case in the Command view; it appears here a few seconds later.</div>';return}
+ const tiles=[tile(a.window.runs,'runs saved',`${d.completed} completed · ${d.handoffs} handed to a human`),
+  tile(k?fmt(k.p50):'–','median time per run',k?`p95 ${fmt(k.p95)} · max ${fmt(k.max)}`:''),
+  tile(ai.ok_rate==null?'–':pc(ai.ok_rate),'AI calls that succeeded',`${ai.calls} calls · ${ai.fallbacks} fell back to rules`),
+  tile(a.window.runs?pc(ai.runs_fully_ai/a.window.runs):'–','runs where every AI step worked',''),
+  tile(d.funnel.avg_candidates,'hospitals found per run',`${d.funnel.avg_eligible} eligible · ${d.funnel.avg_provisional} provisional · ${d.funnel.avg_rejected} rejected`),
+  tile(d.primary_eta_min?d.primary_eta_min.p50.toFixed(1)+' min':'–','median ETA to chosen hospital',''),
+  tile(dp.dispatches,'dispatches sent',dp.accept_rate==null?'':`${pc(dp.accept_rate)} accepted`),
+  tile(dp.time_to_first_reply_s?fmt(dp.time_to_first_reply_s.p50*1000):'–','median time to a hospital reply',dp.time_to_first_reply_s?`from ${dp.time_to_first_reply_s.n} dispatch(es)`:'no replies yet')].join('');
+ const L=a.latency,phases=L.stages.filter(s=>s.depth===1),steps=L.stages.filter(s=>s.depth>=2);
+ const stageBars=(rows)=>{const mx=Math.max(...rows.map(r=>r.p95),1);return rows.map(r=>`<div class="bar"><span class="n">${esc(r.stage.replace(/_/g,' ').toLowerCase())}</span><div class="t"><i style="width:${r.p50/mx*100}%;background:var(--accent)"></i><u style="left:${r.p95/mx*100}%"></u></div><span class="num hint">${fmt(r.p50)} · p95 ${fmt(r.p95)}</span></div>`).join('')};
+ const provCards=Object.entries(ai.providers).map(([p,v])=>`<div class="card kpi" style="box-shadow:none"><div class="l"><b style="color:var(${PROV[p]||'--ai'})">${esc(p)}</b></div><div class="v num" style="font-size:20px">${v.latency_ms?fmt(v.latency_ms.p50):'–'}</div><div class="s">median per call · p95 ${v.latency_ms?fmt(v.latency_ms.p95):'–'} · ${v.calls} calls · ${v.tokens.toLocaleString()} tokens</div></div>`).join('');
+ const stageAI=Object.entries(ai.by_stage).map(([st,c])=>{const tot=Object.values(c).reduce((x,y)=>x+y,0);return`<div class="bar"><span class="n">${esc(st.toLowerCase())}</span><div class="t">${Object.entries(c).reduce((acc,[p,n])=>{const w=n/tot*100;acc.h+=`<i style="left:${acc.o}%;width:${w}%;background:var(${PROV[p]||'--ai'})" title="${esc(p)}: ${n}"></i>`;acc.o+=w;return acc},{h:'',o:0}).h}</div><span class="num hint">${tot} call(s)</span></div>`}).join('');
+ const mix=(o,cmap)=>hbars(Object.entries(o).sort((x,y)=>y[1]-x[1]).map(([l,v])=>({l,v,c:cmap&&cmap[l]})),'--accent');
+ const fu=d.funnel,fmx=Math.max(fu.avg_candidates,1);
+ const funnel=[['found',fu.avg_candidates,'--accent'],['eligible',fu.avg_eligible,'--ok'],['provisional',fu.avg_provisional,'--warn'],['rejected',fu.avg_rejected,'--bad']].map(([l,v,c])=>({l,v,c}));
+ const rows=a.runs.slice(0,60).map(r=>`<tr><td>${esc(when(r.started_at))}</td><td class="${esc(r.priority)}">${esc(r.priority||'?')}</td><td>${r.halted?'<span class="CRITICAL">handoff</span>':esc(r.primary_hospital||'–')}</td><td class="num">${fmt(r.total_ms)}</td><td class="num">${r.n_candidates}/${r.n_eligible}/${r.n_provisional}</td><td class="num">${r.ai_ok}/${r.ai_fallback}</td><td>${esc(r.providers||'–')}</td><td>${esc(r.confidence_level||'–')}</td><td>${esc(r.hospital_source||'')}</td><td><a href="#" data-id="${esc(r.case_id)}">JSON</a></td></tr>`).join('');
+ $('main').innerHTML=`<div class="grid g4">${tiles}</div>
+ <div class="sec">Latency <small>completed runs only · the time from receiving a report to a finished recommendation</small></div>
+ <div class="grid g2"><div class="card"><h2>Total time of each run <span class="r hint">bar colour = urgency</span></h2>${runChart(L.series,k&&k.p50,k&&k.p95)}${legend([['--bad','critical'],['--warn','high'],['--accent','moderate'],['--ok','low']])}</div>
+  <div class="card"><h2>Distribution</h2>${histChart(L.histogram.bins)}<div class="hint">How many runs fell into each time band.</div></div></div>
+ <div class="grid g2" style="margin-top:14px"><div class="card"><h2>Where the time goes · pipeline phases <span class="r hint">bar = median, tick = p95</span></h2>${stageBars(phases)||'<div class="hint">–</div>'}</div>
+  <div class="card"><h2>Individual steps</h2><div class="scroll" style="max-height:330px">${stageBars(steps)||'<div class="hint">–</div>'}</div><div class="hint">Steps in the same phase run in parallel, so they do not add up to the phase time.</div></div></div>
+ <div class="sec">AI agents <small>from every call in the saved runs</small></div>
+ <div class="grid g2"><div class="card"><h2>Providers compared</h2><div class="grid g4" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">${provCards||'<div class="hint">No AI calls recorded.</div>'}</div></div>
+  <div class="card"><h2>Which provider answered each agent</h2>${stageAI||'<div class="hint">–</div>'}${legend([['--accent','groq'],['--core','nvidia'],['--warn','fell back to rules']])}</div></div>
+ <div class="sec">Decisions</div>
+ <div class="grid g2"><div class="card"><h2>Urgency of cases</h2>${mix(d.priority,PRI)}</div>
+  <div class="card"><h2>Hospitals per run <span class="r hint">average</span></h2>${hbars(funnel,'--accent',v=>v)}</div>
+  <div class="card"><h2>Confidence of the recommendation</h2>${mix(d.confidence)}</div>
+  <div class="card"><h2>Most often recommended first</h2>${hbars(d.top_hospitals.map(h=>({l:h.name,v:h.count})),'--core')||'<div class="hint">–</div>'}</div>
+  <div class="card"><h2>Hospital data source</h2>${mix(d.hospital_source)}</div>
+  <div class="card"><h2>Run mode</h2>${mix(d.mode)}</div></div>
+ <div class="sec">Dispatch and hospital replies <small>from the event log</small></div>
+ <div class="grid g2"><div class="card"><h2>Hospital responses</h2>${Object.keys(dp.responses).length?mix(dp.responses,{ACCEPTED:'--ok',DECLINED:'--bad'}):'<div class="hint">No hospital has replied yet.</div>'}</div>
+  <div class="card"><h2>Everything that was logged</h2>${Object.keys(dp.events).length?mix(dp.events):'<div class="hint">No events yet.</div>'}</div></div>
+ <div class="sec">Runs <small>newest first · candidates/eligible/provisional · AI ok/fallback</small></div>
+ <div class="card"><div class="scroll"><table><tr><th>Time</th><th>Urgency</th><th>Recommended</th><th>Total</th><th>Hosp.</th><th>AI</th><th>Providers</th><th>Confidence</th><th>Source</th><th></th></tr>${rows}</table></div></div>
+ <div class="sec">Research data <small>for the report, paper and slides</small></div>
+ <div class="grid g2"><div class="card"><h2>Download</h2>
+   <p class="hint" style="margin-top:0">Plain files you can open in Excel, Python or R. Each respects the time window above.</p>
+   <button class="btn sm" data-csv="runs" type="button">runs.csv</button> <span class="hint">one row per run</span><br><br>
+   <button class="btn sm" data-csv="stages" type="button">stage-timings.csv</button> <span class="hint">one row per step per run</span><br><br>
+   <button class="btn sm" data-csv="events" type="button">events.csv</button> <span class="hint">dispatches, replies, bed reports</span><br><br>
+   <button class="btn ghost sm" id="dlAll" type="button">this dashboard as JSON</button></div>
+  <div class="card"><h2>Summary table <span class="r"><button class="btn ghost sm" id="cpMd" type="button">copy as Markdown</button></span></h2><div class="scroll" style="max-height:300px"><table id="summary"></table></div></div></div>
+ <div class="sec">Method notes</div>
+ <div class="note"><b>How to read these numbers.</b> Time per run is the wall-clock time of the whole pipeline for a completed run, measured inside the server. AI figures count every language-model call, a "fallback" is a step where no model answered in time and the fixed rules ran instead. Cases are written by hand for testing, not real patients. Real hospitals are found live from OpenStreetMap, but their beds and equipment are unknown unless a hospital reports them, so most are ranked as provisional. Percentiles are computed over the runs in the selected window and are only meaningful with enough runs (aim for 30 or more).</div>
+ <pre id="detail" hidden></pre>`;
+ summary();bind()}
+
+function summary(){const a=D,k=a.latency.total,d=a.decisions,ai=a.ai,dp=a.dispatch,f=d.funnel;
+ const rows=[['Runs saved',a.window.runs],['Completed / handed to a human',`${d.completed} / ${d.handoffs}`],['Median time per run',k?fmt(k.p50):'–'],['95th percentile',k?fmt(k.p95):'–'],['Fastest / slowest',k?`${fmt(k.min)} / ${fmt(k.max)}`:'–'],
+  ['AI calls (succeeded)',ai.calls?`${ai.calls} (${pc(ai.ok_rate)})`:'–'],['Runs where every AI step worked',a.window.runs?pc(ai.runs_fully_ai/a.window.runs):'–'],
+  ['Hospitals found / eligible / provisional per run',`${f.avg_candidates} / ${f.avg_eligible} / ${f.avg_provisional}`],['Median ETA to chosen hospital',d.primary_eta_min?d.primary_eta_min.p50.toFixed(1)+' min':'–'],
+  ['Dispatches / accepted',dp.dispatches?`${dp.dispatches} / ${pc(dp.accept_rate)}`:'–'],['Median time to first hospital reply',dp.time_to_first_reply_s?fmt(dp.time_to_first_reply_s.p50*1000):'–']];
+ window.__rows=rows;$('summary').innerHTML='<tr><th>Measure</th><th>Value</th></tr>'+rows.map(r=>`<tr><td>${esc(r[0])}</td><td class="num">${esc(r[1])}</td></tr>`).join('')}
+
+async function api(path){const r=await fetch(path,{headers:{'X-Admin-Token':tok()}});return r}
+function save(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function bind(){
+ document.querySelectorAll('[data-csv]').forEach(b=>b.onclick=async()=>{const r=await api(`/history/export/${b.dataset.csv}?days=${$('win').value}`);if(r.ok)save(`cedcs-${b.dataset.csv}.csv`,await r.blob())});
+ $('dlAll').onclick=()=>save('cedcs-analytics.json',new Blob([JSON.stringify(D,null,2)],{type:'application/json'}));
+ $('cpMd').onclick=()=>{const md='| Measure | Value |\n|---|---|\n'+window.__rows.map(r=>`| ${r[0]} | ${r[1]} |`).join('\n');navigator.clipboard&&navigator.clipboard.writeText(md).then(()=>{$('cpMd').textContent='copied'})};
+ document.querySelectorAll('a[data-id]').forEach(a=>a.onclick=async e=>{e.preventDefault();const r=await api('/history/runs/'+encodeURIComponent(a.dataset.id));if(r.ok)save('cedcs-run-'+a.dataset.id.slice(0,8)+'.json',new Blob([JSON.stringify(await r.json(),null,2)],{type:'application/json'}))})}
+
+async function load(){const t=tok();if(!t){$('main').innerHTML='<div class="empty">Enter the admin token and press Load.</div>';return}
+ try{sessionStorage.setItem('cedcs_admin',t)}catch(e){}
+ $('main').innerHTML='<div class="empty">Loading…</div>';
+ const r=await api('/history/analytics?days='+$('win').value);
+ if(!r.ok){$('main').innerHTML=`<div class="empty">${r.status===403?'Wrong admin token.':'Could not load the analytics (error '+r.status+').'}</div>`;return}
+ D=await r.json();render()}
+$('go').onclick=load;$('win').onchange=load;$('tok').onkeydown=e=>{if(e.key==='Enter')load()};
+fetch('/history/status').then(r=>r.json()).then(s=>{$('where').textContent=s.enabled?'stored in '+s.backend+' · '+s.stored_runs+' runs':'history is off'}).catch(()=>{});
+if(tok())load();
+</script></body></html>
