@@ -227,6 +227,13 @@ th{background:var(--card)}
 dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.4)}dialog::backdrop{background:rgba(5,8,16,.6);backdrop-filter:blur(3px)}
 .contact{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid var(--line);font-size:12.5px}.contact:first-child{border-top:0}.contact b{font-weight:600}.contact .x{margin-left:auto;cursor:pointer;color:var(--bad);background:none;border:0}
 .dbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+#visVid{display:block;width:100%;max-height:230px;object-fit:cover;background:#000;border-radius:8px;margin-bottom:8px}
+#visThumb{display:block;max-width:100%;max-height:150px;border-radius:8px;margin-top:8px}
+.vbox{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--card2)}.vbox p{margin:6px 0}
+.vrow{display:flex;gap:8px;font-size:13px;margin:3px 0}.vrow b{min-width:68px;color:var(--mute);font-weight:600}
+.vchip{display:inline-block;padding:1px 9px;margin-right:4px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid currentColor}
+.vwarn{color:var(--warn);font-size:12px;margin-top:6px}.vlog{margin-top:8px;font-size:12px;color:var(--mute)}.vlog div{padding:2px 0;border-top:1px solid var(--line)}
+.vpulse{animation:vp 1.4s ease-out}@keyframes vp{from{box-shadow:0 0 0 4px var(--bad)}to{box-shadow:0 0 0 0 transparent}}
 </style></head><body>
 <div class="top"><div class="logo">C</div><div><h1>CEDCS Command View</h1><div class="sub">Emergency hospital routing · <span id="subSrc">loading hospital data…</span> · prototype, not for real emergencies</div></div><div class="sp"></div>
  <span class="chip" id="srcChip" title="Where the hospitals on the map come from">🏥 …</span><span class="chip" id="modeChip">mode: —</span><span class="chip" id="totalChip">no run yet</span><a class="btn ghost sm" href="/analytics" title="Saved runs, latency and research data">Analytics</a><button class="btn ghost sm" id="theme" type="button" title="Switch between automatic, light and dark theme">◐ Auto</button><button class="btn ghost sm" id="export" disabled title="Download the full run (timeline, reasoning, recommendation) as JSON">Export run</button></div>
@@ -250,6 +257,21 @@ dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);co
   <label class="toggle"><input type="checkbox" id="slow"> Slow motion (0.4 s per event)</label>
   <div class="hint" id="status" role="status" aria-live="polite" style="margin-top:8px">Ctrl+Enter to run</div>
 </form>
+<div class="card" id="visCard"><h2>Scene analysis <span class="r"><span class="badge" id="visBadge" style="color:var(--ok)" title="Pictures are analysed in memory and discarded">not saved</span></span></h2>
+ <div class="seg" id="visTabs"><button type="button" class="on" data-m="photo">Photo</button><button type="button" data-m="video">Live video</button></div>
+ <div id="visPhoto" style="margin-top:10px">
+  <input type="file" id="visFile" accept="image/*" hidden><input type="file" id="visCam" accept="image/*" capture="environment" hidden>
+  <div class="dbtns"><button type="button" class="btn ghost sm" id="visPick">Choose a photo</button><button type="button" class="btn ghost sm" id="visTake">Take a photo</button></div>
+ </div>
+ <div id="visVideo" hidden style="margin-top:10px">
+  <video id="visVid" muted playsinline></video>
+  <div class="dbtns"><button type="button" class="btn sm" id="visStart">Start camera</button><button type="button" class="btn ghost sm" id="visStop" disabled>Stop</button>
+   <label style="margin:0;font-size:12px">every <select id="visEvery" style="width:auto;padding:2px 6px"><option>4</option><option selected>6</option><option>10</option></select> s</label></div>
+  <div class="hint" id="visNote" style="margin-top:6px">The camera is analysed frame by frame; nothing is recorded.</div>
+ </div>
+ <div id="visOut" aria-live="polite"></div>
+ <div class="hint" style="margin-top:8px">The AI describes only what is visible. It does not diagnose, and the picture is analysed in memory and discarded: not saved, not in the history. Only add what you want to the report.</div>
+</div>
 <div class="card" id="autoCard"><h2>Emergency contacts &amp; automation</h2>
   <div class="hint" style="margin-bottom:6px">Family members who are e-mailed the patient's GPS location and condition when alerts are sent.</div>
   <div id="contacts"></div>
@@ -813,4 +835,5 @@ $('provRefresh').onclick=loadProviders;setInterval(()=>{if(!document.hidden)load
 load();drawSeg();drawLoc();fresh();buildFlow();mapBuild();renderKPIs();loadStats();loadConfig();loadSettings();loadContacts();loadProviders();
 loadHistory();
 </script>
+<script src="/static/vision.js"></script>
 </body></html>

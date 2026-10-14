@@ -734,6 +734,52 @@ async def ack_submit(token: str, request: Request):
     return _ack_page(msg, done=done)
 
 
+# ---------------------------------------------------------------- scene analysis of a photo or video frame (nothing is stored)
+_VISION_HITS: deque = deque()
+_VISION_LOCK = threading.Lock()
+VISION_PER_MIN = 40
+
+
+@app.get("/vision/status")
+def vision_status():
+    from llm import vision
+
+    return {"models": vision.configured(), "available": [f"{p}:{m}" for p, m in vision.available()], "stored": False}
+
+
+@app.post("/vision/analyze")
+async def vision_analyze(request: Request):
+    """Analyse one picture or video frame. It is processed in memory and discarded: not saved, not logged, not in the history
+    (only metadata is: which model, how long, the urgency hint). The request body is read by hand so that a bad request can never
+    echo the picture back in an error."""
+    from starlette.concurrency import run_in_threadpool
+
+    from llm import vision
+
+    now = time.time()
+    with _VISION_LOCK:
+        while _VISION_HITS and now - _VISION_HITS[0] > 60:
+            _VISION_HITS.popleft()
+        if len(_VISION_HITS) >= VISION_PER_MIN:
+            raise HTTPException(status_code=429, detail="too many pictures this minute: use a longer interval for live video")
+        _VISION_HITS.append(now)
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail='send JSON like {"image": "data:image/jpeg;base64,..."}')
+    if not isinstance(body, dict):
+        raise HTTPException(status_code=400, detail='send JSON like {"image": "data:image/jpeg;base64,..."}')
+    source = "video" if body.get("source") == "video" else "photo"
+    try:
+        res = await run_in_threadpool(vision.analyze, body.get("image"), source, body.get("note", ""))
+    except vision.VisionError as exc:
+        raise HTTPException(status_code=exc.status, detail=exc.message)
+    a = res["analysis"]
+    history.event("scene_analysis", source=source, provider=res["provider"], model=res["model"], ms=res["ms"],
+                  urgency_hint=a["urgency_hint"], image_quality=a["image_quality"])
+    return {**res, "stored": False}
+
+
 @app.get("/llm/status")
 def llm_status():
     """Provider health, Groq token budgets and each agent's plan: no secrets."""

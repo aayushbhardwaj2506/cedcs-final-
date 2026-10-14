@@ -149,3 +149,24 @@ it: dispatch sent, hospital accepted/declined, escalation, family update, beds r
   per-run JSON. Percentiles use linear interpolation and are over completed runs; aim for 30+ runs before quoting them.
 
 The same figures are available as JSON at `/history/analytics?days=N` and as CSV at `/history/export/{runs|stages|events}`.
+
+## Scene analysis (photo and live video)
+
+The *Scene analysis* card in the case column lets an operator (or a caller on a phone) show the AI a **photo**, or point a **live camera**
+at the scene. A vision model describes only what is visible: whether a person is seen, their position and movement, visible bleeding
+or injuries, hazards (traffic, fire, water...), a cautious urgency hint, and one sentence the operator can add to the report.
+
+- **Nothing is stored.** The picture is processed in memory for one request and dropped: not written to disk, not in the database or
+  the run history, not in logs, and the answer is not kept either (only metadata: which model, how long, the urgency hint). The browser
+  shrinks and re-encodes every picture first, which also strips its metadata (such as GPS). Live video is analysed one frame at a time
+  (every 4, 6 or 10 s); no video is recorded or uploaded as a file. A live session stops by itself after 3 minutes and when the tab is
+  hidden.
+- **Advisory only.** The AI never changes a case by itself. The sentence reaches the report only when a person presses *Add to
+  report*, and the normal pipeline (with its safety rules) then decides. It never names a condition (such words are removed), never
+  identifies anyone, never judges breathing or pulse from an image, and treats text written inside a picture as data.
+- **Guards against invention.** Blank, flat or very dark pictures are not even sent; the model is told to answer "unusable" rather than
+  invent a person; unknown values become "unclear". Vision models can still be wrong, so the card says so.
+- **Models.** Groq `qwen/qwen3.8-27b`, then NVIDIA `meta/llama-3.2-11b-vision-instruct` as a fallback (other vision models on the
+  free NVIDIA tier either time out or are not available to this account). `POST /vision/analyze` takes `{image: "data:image/jpeg;base64,...",
+  source: "photo"|"video"}`; `GET /vision/status` lists the models. Limited to 40 pictures a minute.
+- The camera needs `https` or `localhost`, and the browser asks for permission.
