@@ -861,6 +861,17 @@ def favicon():
     return Response(status_code=204)
 
 
+@app.middleware("http")
+async def always_revalidate(request: Request, call_next):
+    """The pages and scripts are small and change with each update: make browsers re-check them (a cheap 304 when unchanged) instead
+    of showing an old copy that no longer matches the server."""
+    response = await call_next(request)
+    path = request.url.path
+    if path in ("/", "/analytics") or (path.startswith("/static/") and "/vendor/" not in path):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}

@@ -227,6 +227,9 @@ th{background:var(--card)}
 dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.4)}dialog::backdrop{background:rgba(5,8,16,.6);backdrop-filter:blur(3px)}
 .contact{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid var(--line);font-size:12.5px}.contact:first-child{border-top:0}.contact b{font-weight:600}.contact .x{margin-left:auto;cursor:pointer;color:var(--bad);background:none;border:0}
 .dbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.vseg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card2)}
+.vseg button{flex:1;padding:5px 2px;background:transparent;border:0;border-right:1px solid var(--line);cursor:pointer;font-size:12px;color:var(--mute)}
+.vseg button:last-child{border-right:0}.vseg button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
 #visVid{display:block;width:100%;max-height:230px;object-fit:cover;background:#000;border-radius:8px;margin-bottom:8px}
 #visThumb{display:block;max-width:100%;max-height:150px;border-radius:8px;margin-top:8px}
 .vbox{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--card2)}.vbox p{margin:6px 0}
@@ -258,7 +261,7 @@ dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);co
   <div class="hint" id="status" role="status" aria-live="polite" style="margin-top:8px">Ctrl+Enter to run</div>
 </form>
 <div class="card" id="visCard"><h2>Scene analysis <span class="r"><span class="badge" id="visBadge" style="color:var(--ok)" title="Pictures are analysed in memory and discarded">not saved</span></span></h2>
- <div class="seg" id="visTabs"><button type="button" class="on" data-m="photo">Photo</button><button type="button" data-m="video">Live video</button></div>
+ <div class="vseg" id="visTabs"><button type="button" class="on" data-m="photo">Photo</button><button type="button" data-m="video">Live video</button></div>
  <div id="visPhoto" style="margin-top:10px">
   <input type="file" id="visFile" accept="image/*" hidden><input type="file" id="visCam" accept="image/*" capture="environment" hidden>
   <div class="dbtns"><button type="button" class="btn ghost sm" id="visPick">Choose a photo</button><button type="button" class="btn ghost sm" id="visTake">Take a photo</button></div>
