@@ -121,7 +121,7 @@ def test_everything_failing_raises_llmerror_with_the_status_code(both):
 
 # ---------------------------------------------------------------- health: circuit breaker, cooldown, retired models
 def test_circuit_opens_after_repeated_failures_and_closes_on_recovery(both, monkeypatch):
-    both["script"]["nvidia"] += [FakeResp(status=500)] * providers.FAIL_THRESHOLD
+    both["script"]["nvidia"] += [FakeResp(status=500)] * (2 * providers.FAIL_THRESHOLD)  # each call is retried once, so two 500s make one failure
     for _ in range(providers.FAIL_THRESHOLD):
         groq_agents.intake(dict(RAW))
     assert providers.HEALTH.state("nvidia") == "circuit open" and not providers.HEALTH.available("nvidia")
@@ -308,3 +308,9 @@ def test_status_reports_an_exhausted_groq_quota_and_when_it_returns(both):
     assert s["nvidia"]["state"] == "healthy"  # the other provider is untouched
     providers.BUDGET.reset()
     assert groq_agents.status()["providers"]["groq"]["state"] == "healthy"
+
+
+def test_a_transient_nvidia_500_is_retried_once_like_a_503(both):
+    both["script"]["nvidia"] += [FakeResp(status=500)]  # then the default (success) answers the retry
+    _, info = groq_agents.intake(dict(RAW))
+    assert info.provider == "nvidia" and providers.HEALTH.state("nvidia") == "healthy"

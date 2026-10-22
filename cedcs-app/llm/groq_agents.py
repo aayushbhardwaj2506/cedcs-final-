@@ -36,8 +36,10 @@ from schemas.triage import CAPABILITY_CATEGORIES, TriageResult
 
 CONFIG = Path(__file__).resolve().parent.parent / "cedcs_ai_multi_agent_layer" / "config"
 
-NV_SUPER = "nvidia:nvidia/nemotron-3-super-120b-a12b"  # fast (~1.5-3 s), reliable JSON with thinking off
-NV_GEMMA = "nvidia:google/gemma-4-31b-it"
+# NVIDIA's free hosted models rotate (a model that worked yesterday can answer 404 today), so the two models are configurable:
+# NVIDIA_MODEL leads (fast, JSON with thinking off), NVIDIA_MODEL_FALLBACK is only a late fallback.
+NV_SUPER = "nvidia:" + os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3.5-super-vl-120b-a12b")
+NV_GEMMA = "nvidia:" + os.environ.get("NVIDIA_MODEL_FALLBACK", "nvidia/nemotron-3-ultra-550b-a55b")
 GQ_120B = "groq:openai/gpt-oss-120b"
 GQ_20B = "groq:openai/gpt-oss-20b"
 
@@ -222,7 +224,7 @@ def _attempt(prov: str, model: str, system: str, user: str, json_mode: bool, max
         if r.status_code == 400 and prov == "nvidia" and json_mode and attempt == 1 and model not in providers.NO_JSON_MODE:
             providers.NO_JSON_MODE.add(model)  # provider rejected response_format: retry once without it
             continue
-        if r.status_code in (502, 503, 504) and prov == "nvidia" and attempt == 1:
+        if r.status_code in (500, 502, 503, 504) and prov == "nvidia" and attempt == 1:
             time.sleep(0.4)  # NVIDIA's free endpoints throw the odd transient 503: one quick retry before it counts as a failure
             continue
         if r.status_code >= 500:

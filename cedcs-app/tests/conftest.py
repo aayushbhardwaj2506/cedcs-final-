@@ -27,6 +27,10 @@ from pathlib import Path
 for _k in ("LOCATIONIQ_KEY", "GROQ_API_KEY", "NVIDIA_API_KEY", "OPENAI_API_KEY", "CEDCS_LLM_BASE_URL", "CEDCS_LLM_PROVIDERS", "APP_DATABASE_URL", "HISTORY_DATABASE_URL"):
     os.environ[_k] = ""
 
+# The tests name NVIDIA's models explicitly: pin them so that rotating the defaults never changes a test.
+os.environ["NVIDIA_MODEL"] = "nvidia/nemotron-3-super-120b-a12b"
+os.environ["NVIDIA_MODEL_FALLBACK"] = "google/gemma-4-31b-it"
+
 import pytest  # noqa: E402
 
 

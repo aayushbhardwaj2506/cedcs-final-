@@ -158,25 +158,25 @@ Deterministic decision core alone (freshness scoring, eligibility gate, ranking,
 
 | Stage | n | median (s) | p95 (s) | max (s) |
 |---|---|---|---|---|
-| Whole pipeline | 45 | 24.48 | 104.76 | 249.00 |
-| front crew | 45 | 21.977 | 97.124 | 242.964 |
-| explanation | 45 | 1.333 | 3.601 | 4.923 |
-| deterministic core | 45 | 1.138 | 2.861 | 19.980 |
-| red flags | 45 | 0.000 | 0.000 | 0.001 |
-| validation gate | 45 | 0.000 | 0.000 | 0.002 |
-|   resource interpretation | 45 | 10.954 | 60.417 | 199.026 |
-|   facility discovery | 45 | 4.893 | 36.637 | 40.366 |
-|   critic | 45 | 3.426 | 9.004 | 13.983 |
-|   intake | 45 | 3.208 | 16.831 | 19.879 |
-|   clarification | 45 | 2.460 | 8.576 | 11.170 |
-|   triage | 45 | 1.215 | 3.326 | 3.742 |
-|   advisor | 45 | 1.127 | 2.850 | 19.977 |
-|   eta routing | 45 | 0.241 | 1.688 | 2.120 |
-|   re rank | 13 | 0.001 | 0.004 | 0.005 |
-|   eligibility | 45 | 0.001 | 0.002 | 0.004 |
-|   ranking | 45 | 0.001 | 0.003 | 0.008 |
-|   engine | 45 | 0.001 | 0.002 | 0.004 |
+| Whole pipeline | 47 | 25.10 | 100.99 | 249.00 |
+| front crew | 47 | 22.506 | 93.898 | 242.964 |
+| explanation | 47 | 1.235 | 3.568 | 4.923 |
+| deterministic core | 47 | 1.138 | 2.853 | 19.980 |
+| red flags | 47 | 0.000 | 0.000 | 0.001 |
+| validation gate | 47 | 0.000 | 0.000 | 0.002 |
+|   resource interpretation | 47 | 11.042 | 60.181 | 199.026 |
+|   facility discovery | 47 | 4.027 | 35.932 | 40.366 |
+|   critic | 46 | 3.309 | 8.996 | 13.983 |
+|   intake | 47 | 3.208 | 15.921 | 19.879 |
+|   clarification | 47 | 2.460 | 9.094 | 30.074 |
+|   triage | 47 | 1.215 | 3.294 | 3.742 |
+|   advisor | 46 | 1.173 | 2.846 | 19.977 |
+|   eta routing | 47 | 0.241 | 1.626 | 2.120 |
+|   re rank | 14 | 0.002 | 0.004 | 0.005 |
+|   eligibility | 47 | 0.001 | 0.002 | 0.004 |
+|   ranking | 47 | 0.001 | 0.003 | 0.008 |
+|   engine | 47 | 0.001 | 0.002 | 0.004 |
 |   bed check | 9 | 0.001 | 0.002 | 0.002 |
-|   requirements | 45 | 0.000 | 0.000 | 0.089 |
-|   freshness | 45 | 0.000 | 0.000 | 0.001 |
-|   escalation | 45 | 0.000 | 0.000 | 0.001 |
+|   requirements | 47 | 0.000 | 0.000 | 0.089 |
+|   freshness | 47 | 0.000 | 0.000 | 0.001 |
+|   escalation | 47 | 0.000 | 0.000 | 0.001 |
