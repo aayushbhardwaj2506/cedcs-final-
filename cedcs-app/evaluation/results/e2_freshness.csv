@@ -1,0 +1,13 @@
+age_h,policy,undertriage,handoff_rate,req_coverage
+0.0,CEDCS (freshness on),0.001,0.0,0.9997083333333334
+0.0,CEDCS (freshness off),0.001,0.0,0.9997083333333334
+0.0,"B4 soft ranking, no gate, no freshness",0.107,0.0,0.9592166666666667
+1.0,CEDCS (freshness on),0.0075,0.0,0.99815
+1.0,CEDCS (freshness off),0.0065,0.0,0.9984166666666666
+1.0,"B4 soft ranking, no gate, no freshness",0.156,0.0,0.940875
+4.0,CEDCS (freshness on),0.0245,0.0,0.99185
+4.0,CEDCS (freshness off),0.0225,0.0,0.9927666666666667
+4.0,"B4 soft ranking, no gate, no freshness",0.169,0.0,0.9375416666666666
+12.0,CEDCS (freshness on),0.056,0.0,0.9847250000000001
+12.0,CEDCS (freshness off),0.048,0.0,0.986875
+12.0,"B4 soft ranking, no gate, no freshness",0.256,0.0,0.900775

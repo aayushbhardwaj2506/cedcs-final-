@@ -1,0 +1,3307 @@
+{
+ "config": {
+  "seed": 42,
+  "worlds": 20,
+  "cases": 100,
+  "hospitals": 60
+ },
+ "e1": {
+  "relaxed": {
+   "summary": {
+    "B1 nearest": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.5125,
+     "undertriage_ci": [
+      0.4905904146137529,
+      0.5343616574462342
+     ],
+     "undertriage_avoidable": 0.5125,
+     "undertriage_avoidable_ci": [
+      0.4905904146137529,
+      0.5343616574462342
+     ],
+     "n_avoidable": 2000,
+     "violations": 995,
+     "violation_rate": 0.4975,
+     "overtriage": 0.0,
+     "req_coverage": [
+      0.7098416666666667,
+      0.6953416666666667,
+      0.7245916666666667
+     ],
+     "full_coverage": [
+      0.701025,
+      0.6872952380952381,
+      0.7155238095238096
+     ],
+     "excess_min": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "cost": [
+      5.125,
+      4.91,
+      5.335
+     ],
+     "ms_mean": 0.0
+    },
+    "B2 nearest with ED": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.397,
+     "undertriage_ci": [
+      0.3757736517996124,
+      0.4186212744260933
+     ],
+     "undertriage_avoidable": 0.397,
+     "undertriage_avoidable_ci": [
+      0.3757736517996124,
+      0.4186212744260933
+     ],
+     "n_avoidable": 2000,
+     "violations": 771,
+     "violation_rate": 0.3855,
+     "overtriage": 0.0115,
+     "req_coverage": [
+      0.8254416666666666,
+      0.814975,
+      0.8360333333333333
+     ],
+     "full_coverage": [
+      0.7970464285714286,
+      0.786379761904762,
+      0.807672619047619
+     ],
+     "excess_min": [
+      0.30245,
+      0.24645000000000003,
+      0.36569999999999997
+     ],
+     "cost": [
+      3.9966225,
+      3.7733075,
+      4.211245
+     ],
+     "ms_mean": 0.0
+    },
+    "B3 distance + specialty": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1175,
+     "undertriage_ci": [
+      0.1041148401165495,
+      0.1323517548478429
+     ],
+     "undertriage_avoidable": 0.1175,
+     "undertriage_avoidable_ci": [
+      0.1041148401165495,
+      0.1323517548478429
+     ],
+     "n_avoidable": 2000,
+     "violations": 243,
+     "violation_rate": 0.1215,
+     "overtriage": 0.017,
+     "req_coverage": [
+      0.954975,
+      0.9488416666666667,
+      0.9609249999999999
+     ],
+     "full_coverage": [
+      0.9054380952380953,
+      0.8985892857142856,
+      0.9122690476190476
+     ],
+     "excess_min": [
+      0.79235,
+      0.6918500000000001,
+      0.90225
+     ],
+     "cost": [
+      1.2316175,
+      1.09075,
+      1.3705450000000001
+     ],
+     "ms_mean": 0.0
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.124,
+     "undertriage_ci": [
+      0.11027214814271148,
+      0.13916952429287424
+     ],
+     "undertriage_avoidable": 0.124,
+     "undertriage_avoidable_ci": [
+      0.11027214814271148,
+      0.13916952429287424
+     ],
+     "n_avoidable": 2000,
+     "violations": 231,
+     "violation_rate": 0.1155,
+     "overtriage": 0.0325,
+     "req_coverage": [
+      0.9566,
+      0.950525,
+      0.9624416666666668
+     ],
+     "full_coverage": [
+      0.9531369047619048,
+      0.9486654761904761,
+      0.9575785714285714
+     ],
+     "excess_min": [
+      1.7143,
+      1.57295,
+      1.8591499999999999
+     ],
+     "cost": [
+      1.358215,
+      1.212035,
+      1.5011424999999998
+     ],
+     "ms_mean": 0.5986892005312257
+    },
+    "CEDCS": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.002,
+     "undertriage_ci": [
+      0.0007780147254709095,
+      0.005131434404639974
+     ],
+     "undertriage_avoidable": 0.002,
+     "undertriage_avoidable_ci": [
+      0.0007780147254709095,
+      0.005131434404639974
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.0435,
+     "req_coverage": [
+      0.9995,
+      0.999,
+      0.999875
+     ],
+     "full_coverage": [
+      0.9729107142857143,
+      0.96965,
+      0.9758809523809524
+     ],
+     "excess_min": [
+      3.3621999999999996,
+      3.0995500000000002,
+      3.6133
+     ],
+     "cost": [
+      0.23161,
+      0.20801750000000002,
+      0.2602225
+     ],
+     "ms_mean": 0.7601451494847424
+    },
+    "oracle": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0,
+     "undertriage_ci": [
+      0.0,
+      0.0019171176005129348
+     ],
+     "undertriage_avoidable": 0.0,
+     "undertriage_avoidable_ci": [
+      0.0,
+      0.0019171176005129348
+     ],
+     "n_avoidable": 2000,
+     "violations": 43,
+     "violation_rate": 0.0215,
+     "overtriage": 0.0,
+     "req_coverage": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "full_coverage": [
+      0.9490392857142858,
+      0.9446809523809524,
+      0.953147619047619
+     ],
+     "excess_min": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "cost": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "ms_mean": 0.0
+    }
+   },
+   "mcnemar_p_vs_cedcs": {
+    "B1 nearest": 8.900295434028806e-308,
+    "B2 nearest with ED": 6.058602363065388e-234,
+    "B3 distance + specialty": 2.0093410860352543e-65,
+    "B4 soft ranking, no gate, no freshness": 7.074749280333369e-74
+   },
+   "calibration": {
+    "HIGH": {
+     "n": 233,
+     "appropriate": 1.0,
+     "ci": [
+      0.9837798765081812,
+      1.0
+     ]
+    },
+    "MODERATE": {
+     "n": 1747,
+     "appropriate": 0.9977103606182026,
+     "ci": [
+      0.9941273548085164,
+      0.9991092692241773
+     ]
+    },
+    "LOW": {
+     "n": 20,
+     "appropriate": 1.0,
+     "ci": [
+      0.8388698745050667,
+      1.0
+     ]
+    }
+   },
+   "undertriage_by_priority": {
+    "B3 distance + specialty": {
+     "LOW": 0.0,
+     "MODERATE": 0.025341130604288498,
+     "HIGH": 0.18459069020866772,
+     "CRITICAL": 0.18706293706293706
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "LOW": 0.07534246575342465,
+     "MODERATE": 0.12475633528265107,
+     "HIGH": 0.11556982343499198,
+     "CRITICAL": 0.15734265734265734
+    },
+    "CEDCS": {
+     "LOW": 0.0,
+     "MODERATE": 0.0,
+     "HIGH": 0.0016051364365971107,
+     "CRITICAL": 0.005244755244755245
+    }
+   },
+   "rungs": {
+    "widened": 214,
+    "none": 1786
+   },
+   "n_provisional_mean": 2.338,
+   "n_eligible_mean": 7.8065
+  },
+  "normal": {
+   "summary": {
+    "B1 nearest": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.5345,
+     "undertriage_ci": [
+      0.5125934856942053,
+      0.5562742331913594
+     ],
+     "undertriage_avoidable": 0.5345,
+     "undertriage_avoidable_ci": [
+      0.5125934856942053,
+      0.5562742331913594
+     ],
+     "n_avoidable": 2000,
+     "violations": 1034,
+     "violation_rate": 0.517,
+     "overtriage": 0.0,
+     "req_coverage": [
+      0.6985583333333333,
+      0.6843416666666667,
+      0.713875
+     ],
+     "full_coverage": [
+      0.6905035714285713,
+      0.6771595238095237,
+      0.7049583333333334
+     ],
+     "excess_min": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "cost": [
+      5.345,
+      5.125,
+      5.55
+     ],
+     "ms_mean": 0.0
+    },
+    "B2 nearest with ED": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.4215,
+     "undertriage_ci": [
+      0.40002901620216197,
+      0.44327197126111856
+     ],
+     "undertriage_avoidable": 0.4215,
+     "undertriage_avoidable_ci": [
+      0.40002901620216197,
+      0.44327197126111856
+     ],
+     "n_avoidable": 2000,
+     "violations": 811,
+     "violation_rate": 0.4055,
+     "overtriage": 0.0115,
+     "req_coverage": [
+      0.8128500000000001,
+      0.8023083333333333,
+      0.8240416666666667
+     ],
+     "full_coverage": [
+      0.7854702380952381,
+      0.77495,
+      0.7961619047619048
+     ],
+     "excess_min": [
+      0.2846,
+      0.2282,
+      0.3469
+     ],
+     "cost": [
+      4.240729999999999,
+      4.017657499999999,
+      4.4578625
+     ],
+     "ms_mean": 0.0
+    },
+    "B3 distance + specialty": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1495,
+     "undertriage_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "undertriage_avoidable": 0.1495,
+     "undertriage_avoidable_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "n_avoidable": 2000,
+     "violations": 300,
+     "violation_rate": 0.15,
+     "overtriage": 0.017,
+     "req_coverage": [
+      0.9430083333333333,
+      0.9362166666666667,
+      0.9493833333333334
+     ],
+     "full_coverage": [
+      0.8944642857142857,
+      0.8870916666666667,
+      0.9019047619047619
+     ],
+     "excess_min": [
+      0.77075,
+      0.6674500000000001,
+      0.88015
+     ],
+     "cost": [
+      1.5505375,
+      1.4019774999999999,
+      1.712795
+     ],
+     "ms_mean": 0.0
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.153,
+     "undertriage_ci": [
+      0.13788919052470294,
+      0.16944128909005307
+     ],
+     "undertriage_avoidable": 0.153,
+     "undertriage_avoidable_ci": [
+      0.13788919052470294,
+      0.16944128909005307
+     ],
+     "n_avoidable": 2000,
+     "violations": 281,
+     "violation_rate": 0.1405,
+     "overtriage": 0.0315,
+     "req_coverage": [
+      0.9464416666666667,
+      0.939625,
+      0.953175
+     ],
+     "full_coverage": [
+      0.9469797619047619,
+      0.9420571428571428,
+      0.9518904761904762
+     ],
+     "excess_min": [
+      1.6618,
+      1.525,
+      1.7992000000000001
+     ],
+     "cost": [
+      1.64459,
+      1.4866325,
+      1.790385
+     ],
+     "ms_mean": 0.6266687006573193
+    },
+    "CEDCS": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0095,
+     "undertriage_ci": [
+      0.006090191210478055,
+      0.014790501155625134
+     ],
+     "undertriage_avoidable": 0.0095,
+     "undertriage_avoidable_ci": [
+      0.006090191210478055,
+      0.014790501155625134
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.0395,
+     "req_coverage": [
+      0.9973416666666667,
+      0.9961,
+      0.9984416666666667
+     ],
+     "full_coverage": [
+      0.9695785714285714,
+      0.9661488095238095,
+      0.9727535714285713
+     ],
+     "excess_min": [
+      3.64335,
+      3.3483,
+      3.9454499999999997
+     ],
+     "cost": [
+      0.3166675,
+      0.275225,
+      0.361605
+     ],
+     "ms_mean": 0.8017629009555094
+    },
+    "oracle": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0,
+     "undertriage_ci": [
+      0.0,
+      0.0019171176005129348
+     ],
+     "undertriage_avoidable": 0.0,
+     "undertriage_avoidable_ci": [
+      0.0,
+      0.0019171176005129348
+     ],
+     "n_avoidable": 2000,
+     "violations": 52,
+     "violation_rate": 0.026,
+     "overtriage": 0.0,
+     "req_coverage": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "full_coverage": [
+      0.9474488095238095,
+      0.9428154761904761,
+      0.9518892857142858
+     ],
+     "excess_min": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "cost": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "ms_mean": 0.0
+    }
+   },
+   "mcnemar_p_vs_cedcs": {
+    "B1 nearest": 3.3744930948037226e-308,
+    "B2 nearest with ED": 6.179090995205987e-236,
+    "B3 distance + specialty": 1.4215703358206984e-72,
+    "B4 soft ranking, no gate, no freshness": 9.848253235123961e-81
+   },
+   "calibration": {
+    "HIGH": {
+     "n": 227,
+     "appropriate": 1.0,
+     "ci": [
+      0.9833582855083312,
+      1.0
+     ]
+    },
+    "MODERATE": {
+     "n": 1751,
+     "appropriate": 0.989149057681325,
+     "ci": [
+      0.9831140521577284,
+      0.9930424282904216
+     ]
+    },
+    "LOW": {
+     "n": 22,
+     "appropriate": 1.0,
+     "ci": [
+      0.8513404742740388,
+      1.0
+     ]
+    }
+   },
+   "undertriage_by_priority": {
+    "B3 distance + specialty": {
+     "LOW": 0.0,
+     "MODERATE": 0.025341130604288498,
+     "HIGH": 0.24879614767255218,
+     "CRITICAL": 0.229020979020979
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "LOW": 0.0821917808219178,
+     "MODERATE": 0.13060428849902533,
+     "HIGH": 0.15409309791332262,
+     "CRITICAL": 0.20804195804195805
+    },
+    "CEDCS": {
+     "LOW": 0.0,
+     "MODERATE": 0.0,
+     "HIGH": 0.014446227929373997,
+     "CRITICAL": 0.017482517482517484
+    }
+   },
+   "rungs": {
+    "widened": 256,
+    "none": 1744
+   },
+   "n_provisional_mean": 2.354,
+   "n_eligible_mean": 7.7885
+  },
+  "crowded": {
+   "summary": {
+    "B1 nearest": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.601,
+     "undertriage_ci": [
+      0.5793643475324987,
+      0.6222483947121976
+     ],
+     "undertriage_avoidable": 0.601,
+     "undertriage_avoidable_ci": [
+      0.5793643475324987,
+      0.6222483947121976
+     ],
+     "n_avoidable": 2000,
+     "violations": 1143,
+     "violation_rate": 0.5715,
+     "overtriage": 0.0,
+     "req_coverage": [
+      0.6634833333333333,
+      0.64955,
+      0.6789416666666666
+     ],
+     "full_coverage": [
+      0.6584416666666667,
+      0.6453916666666667,
+      0.6728607142857143
+     ],
+     "excess_min": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "cost": [
+      6.01,
+      5.795,
+      6.215
+     ],
+     "ms_mean": 0.0
+    },
+    "B2 nearest with ED": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.5105,
+     "undertriage_ci": [
+      0.4885922380698428,
+      0.5323675024605464
+     ],
+     "undertriage_avoidable": 0.5105,
+     "undertriage_avoidable_ci": [
+      0.4885922380698428,
+      0.5323675024605464
+     ],
+     "n_avoidable": 2000,
+     "violations": 956,
+     "violation_rate": 0.478,
+     "overtriage": 0.0115,
+     "req_coverage": [
+      0.7690499999999999,
+      0.7582166666666666,
+      0.7803166666666667
+     ],
+     "full_coverage": [
+      0.7454011904761905,
+      0.7344380952380952,
+      0.7561464285714286
+     ],
+     "excess_min": [
+      0.2479,
+      0.19469999999999998,
+      0.30375
+     ],
+     "cost": [
+      5.128895000000001,
+      4.9051575000000005,
+      5.348064999999999
+     ],
+     "ms_mean": 0.0
+    },
+    "B3 distance + specialty": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.287,
+     "undertriage_ci": [
+      0.2675975298565808,
+      0.3072191622412377
+     ],
+     "undertriage_avoidable": 0.287,
+     "undertriage_avoidable_ci": [
+      0.2675975298565808,
+      0.3072191622412377
+     ],
+     "n_avoidable": 2000,
+     "violations": 528,
+     "violation_rate": 0.264,
+     "overtriage": 0.017,
+     "req_coverage": [
+      0.8961749999999999,
+      0.8883333333333334,
+      0.9047333333333334
+     ],
+     "full_coverage": [
+      0.85415,
+      0.8460952380952381,
+      0.8622988095238096
+     ],
+     "excess_min": [
+      0.6194,
+      0.52735,
+      0.7179500000000001
+     ],
+     "cost": [
+      2.91797,
+      2.7152399999999997,
+      3.132235
+     ],
+     "ms_mean": 0.0
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.2245,
+     "undertriage_ci": [
+      0.2067511679455928,
+      0.24330516385228987
+     ],
+     "undertriage_avoidable": 0.2245,
+     "undertriage_avoidable_ci": [
+      0.2067511679455928,
+      0.24330516385228987
+     ],
+     "n_avoidable": 2000,
+     "violations": 382,
+     "violation_rate": 0.191,
+     "overtriage": 0.0305,
+     "req_coverage": [
+      0.9198083333333332,
+      0.91175,
+      0.9269666666666667
+     ],
+     "full_coverage": [
+      0.9220440476190477,
+      0.9165059523809524,
+      0.9271583333333333
+     ],
+     "excess_min": [
+      1.2438,
+      1.12245,
+      1.36575
+     ],
+     "cost": [
+      2.3376900000000003,
+      2.1489825000000002,
+      2.5201175
+     ],
+     "ms_mean": 0.6846106996526942
+    },
+    "CEDCS": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.039,
+     "undertriage_ci": [
+      0.03136130698332722,
+      0.04840627544434571
+     ],
+     "undertriage_avoidable": 0.039,
+     "undertriage_avoidable_ci": [
+      0.03136130698332722,
+      0.04840627544434571
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.04,
+     "req_coverage": [
+      0.9878250000000001,
+      0.9848583333333334,
+      0.9905499999999999
+     ],
+     "full_coverage": [
+      0.9594369047619048,
+      0.9553452380952381,
+      0.963522619047619
+     ],
+     "excess_min": [
+      4.49205,
+      4.1233,
+      4.863899999999999
+     ],
+     "cost": [
+      0.6546025,
+      0.5702775,
+      0.7406275000000001
+     ],
+     "ms_mean": 0.9673196513904259
+    },
+    "oracle": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0,
+     "undertriage_ci": [
+      0.0,
+      0.0019171176005129348
+     ],
+     "undertriage_avoidable": 0.0,
+     "undertriage_avoidable_ci": [
+      0.0,
+      0.0019171176005129348
+     ],
+     "n_avoidable": 2000,
+     "violations": 89,
+     "violation_rate": 0.0445,
+     "overtriage": 0.0,
+     "req_coverage": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "full_coverage": [
+      0.9432702380952381,
+      0.9390226190476191,
+      0.9475202380952381
+     ],
+     "excess_min": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "cost": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "ms_mean": 0.0
+    }
+   },
+   "mcnemar_p_vs_cedcs": {
+    "B1 nearest": 5.45899e-318,
+    "B2 nearest with ED": 7.03170448804868e-262,
+    "B3 distance + specialty": 2.0057000936202736e-127,
+    "B4 soft ranking, no gate, no freshness": 1.9367338134834568e-90
+   },
+   "calibration": {
+    "HIGH": {
+     "n": 216,
+     "appropriate": 0.9953703703703703,
+     "ci": [
+      0.9742458312701834,
+      0.9991823097186012
+     ]
+    },
+    "MODERATE": {
+     "n": 1760,
+     "appropriate": 0.9568181818181818,
+     "ci": [
+      0.9462850287389557,
+      0.9653614592449993
+     ]
+    },
+    "LOW": {
+     "n": 24,
+     "appropriate": 0.9583333333333334,
+     "ci": [
+      0.7975777375115778,
+      0.992606734645195
+     ]
+    }
+   },
+   "undertriage_by_priority": {
+    "B3 distance + specialty": {
+     "LOW": 0.0,
+     "MODERATE": 0.025341130604288498,
+     "HIGH": 0.45746388443017655,
+     "CRITICAL": 0.4825174825174825
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "LOW": 0.07876712328767123,
+     "MODERATE": 0.13255360623781676,
+     "HIGH": 0.28892455858747995,
+     "CRITICAL": 0.3111888111888112
+    },
+    "CEDCS": {
+     "LOW": 0.0,
+     "MODERATE": 0.0,
+     "HIGH": 0.07865168539325842,
+     "CRITICAL": 0.050699300699300696
+    }
+   },
+   "rungs": {
+    "widened": 512,
+    "none": 1488
+   },
+   "n_provisional_mean": 2.5635,
+   "n_eligible_mean": 7.9625
+  }
+ },
+ "e2": {
+  "0.0": {
+   "summary": {
+    "CEDCS (freshness on)": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.001,
+     "undertriage_ci": [
+      0.000274273176083379,
+      0.0036390101892285302
+     ],
+     "undertriage_avoidable": 0.001,
+     "undertriage_avoidable_ci": [
+      0.000274273176083379,
+      0.0036390101892285302
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.046,
+     "req_coverage": [
+      0.9997083333333334,
+      0.9992083333333334,
+      1.0
+     ],
+     "full_coverage": [
+      0.9830476190476191,
+      0.9804666666666667,
+      0.9854690476190476
+     ],
+     "excess_min": [
+      3.1611,
+      2.9177,
+      3.4162
+     ],
+     "cost": [
+      0.214055,
+      0.1938275,
+      0.2350125
+     ],
+     "ms_mean": 0.7561133997514844
+    },
+    "CEDCS (freshness off)": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.001,
+     "undertriage_ci": [
+      0.000274273176083379,
+      0.0036390101892285302
+     ],
+     "undertriage_avoidable": 0.001,
+     "undertriage_avoidable_ci": [
+      0.000274273176083379,
+      0.0036390101892285302
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.046,
+     "req_coverage": [
+      0.9997083333333334,
+      0.9992083333333334,
+      1.0
+     ],
+     "full_coverage": [
+      0.9830476190476191,
+      0.9804666666666667,
+      0.9854690476190476
+     ],
+     "excess_min": [
+      3.1611,
+      2.9177,
+      3.4162
+     ],
+     "cost": [
+      0.214055,
+      0.1938275,
+      0.2350125
+     ],
+     "ms_mean": 0.7355794001487084
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.107,
+     "undertriage_ci": [
+      0.09419797973571457,
+      0.12130887469828859
+     ],
+     "undertriage_avoidable": 0.107,
+     "undertriage_avoidable_ci": [
+      0.09419797973571457,
+      0.12130887469828859
+     ],
+     "n_avoidable": 2000,
+     "violations": 193,
+     "violation_rate": 0.0965,
+     "overtriage": 0.0395,
+     "req_coverage": [
+      0.9592166666666667,
+      0.9526,
+      0.9652583333333333
+     ],
+     "full_coverage": [
+      0.9609678571428572,
+      0.9565845238095239,
+      0.9649785714285714
+     ],
+     "excess_min": [
+      1.64025,
+      1.49385,
+      1.77605
+     ],
+     "cost": [
+      1.1915125,
+      1.0595525000000001,
+      1.32345
+     ],
+     "ms_mean": 0.55066300049657
+    }
+   },
+   "mcnemar_p_on_vs_off": 1.0,
+   "calibration_on": {
+    "HIGH": {
+     "n": 1454,
+     "appropriate": 0.9986244841815681,
+     "ci": [
+      0.9949983783838627,
+      0.9996227107660147
+     ]
+    },
+    "MODERATE": {
+     "n": 546,
+     "appropriate": 1.0,
+     "ci": [
+      0.9930132605463099,
+      1.0
+     ]
+    },
+    "LOW": {
+     "n": 0,
+     "appropriate": null,
+     "ci": [
+      null,
+      null
+     ]
+    }
+   },
+   "calibration_off": {
+    "HIGH": {
+     "n": 1454,
+     "appropriate": 0.9986244841815681,
+     "ci": [
+      0.9949983783838627,
+      0.9996227107660147
+     ]
+    },
+    "MODERATE": {
+     "n": 546,
+     "appropriate": 1.0,
+     "ci": [
+      0.9930132605463099,
+      1.0
+     ]
+    },
+    "LOW": {
+     "n": 0,
+     "appropriate": null,
+     "ci": [
+      null,
+      null
+     ]
+    }
+   }
+  },
+  "1.0": {
+   "summary": {
+    "CEDCS (freshness on)": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0075,
+     "undertriage_ci": [
+      0.004550336456172238,
+      0.012338024380333004
+     ],
+     "undertriage_avoidable": 0.0075,
+     "undertriage_avoidable_ci": [
+      0.004550336456172238,
+      0.012338024380333004
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.0415,
+     "req_coverage": [
+      0.99815,
+      0.9970333333333333,
+      0.9990333333333333
+     ],
+     "full_coverage": [
+      0.9725345238095238,
+      0.9690238095238095,
+      0.975927380952381
+     ],
+     "excess_min": [
+      3.3589499999999997,
+      3.09355,
+      3.6288
+     ],
+     "cost": [
+      0.28444749999999996,
+      0.24669,
+      0.3307575
+     ],
+     "ms_mean": 0.8098307494074106
+    },
+    "CEDCS (freshness off)": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0065,
+     "undertriage_ci": [
+      0.0038025598686868152,
+      0.01108963520301945
+     ],
+     "undertriage_avoidable": 0.0065,
+     "undertriage_avoidable_ci": [
+      0.0038025598686868152,
+      0.01108963520301945
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.049,
+     "req_coverage": [
+      0.9984166666666666,
+      0.9974333333333333,
+      0.9992166666666666
+     ],
+     "full_coverage": [
+      0.9769392857142857,
+      0.973802380952381,
+      0.9800583333333333
+     ],
+     "excess_min": [
+      3.6533,
+      3.37325,
+      3.96265
+     ],
+     "cost": [
+      0.296665,
+      0.2621975,
+      0.33940250000000005
+     ],
+     "ms_mean": 0.7949052518815733
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.156,
+     "undertriage_ci": [
+      0.1407582213108657,
+      0.17256075559828718
+     ],
+     "undertriage_avoidable": 0.156,
+     "undertriage_avoidable_ci": [
+      0.1407582213108657,
+      0.17256075559828718
+     ],
+     "n_avoidable": 2000,
+     "violations": 289,
+     "violation_rate": 0.1445,
+     "overtriage": 0.0395,
+     "req_coverage": [
+      0.940875,
+      0.9334333333333332,
+      0.9478166666666668
+     ],
+     "full_coverage": [
+      0.9412571428571429,
+      0.9357845238095238,
+      0.9462190476190476
+     ],
+     "excess_min": [
+      1.5394,
+      1.40835,
+      1.6750999999999998
+     ],
+     "cost": [
+      1.6764700000000001,
+      1.5125325,
+      1.8394875
+     ],
+     "ms_mean": 0.5208083494217135
+    }
+   },
+   "mcnemar_p_on_vs_off": 0.625,
+   "calibration_on": {
+    "HIGH": {
+     "n": 32,
+     "appropriate": 1.0,
+     "ci": [
+      0.8928172849426366,
+      1.0
+     ]
+    },
+    "MODERATE": {
+     "n": 1946,
+     "appropriate": 0.9922918807810894,
+     "ci": [
+      0.9873206736497727,
+      0.9953232498361145
+     ]
+    },
+    "LOW": {
+     "n": 22,
+     "appropriate": 1.0,
+     "ci": [
+      0.8513404742740388,
+      1.0
+     ]
+    }
+   },
+   "calibration_off": {
+    "HIGH": {
+     "n": 1442,
+     "appropriate": 0.9951456310679612,
+     "ci": [
+      0.9900134538246608,
+      0.9976466052025521
+     ]
+    },
+    "MODERATE": {
+     "n": 558,
+     "appropriate": 0.989247311827957,
+     "ci": [
+      0.976741197274508,
+      0.9950629553549876
+     ]
+    },
+    "LOW": {
+     "n": 0,
+     "appropriate": null,
+     "ci": [
+      null,
+      null
+     ]
+    }
+   }
+  },
+  "4.0": {
+   "summary": {
+    "CEDCS (freshness on)": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0245,
+     "undertriage_ci": [
+      0.01858153622439221,
+      0.032241642613695595
+     ],
+     "undertriage_avoidable": 0.0245,
+     "undertriage_avoidable_ci": [
+      0.01858153622439221,
+      0.032241642613695595
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.0445,
+     "req_coverage": [
+      0.99185,
+      0.9894583333333333,
+      0.9941416666666667
+     ],
+     "full_coverage": [
+      0.9615880952380952,
+      0.9575845238095239,
+      0.9655845238095239
+     ],
+     "excess_min": [
+      3.7746999999999997,
+      3.4751,
+      4.06485
+     ],
+     "cost": [
+      0.478235,
+      0.41270249999999997,
+      0.545725
+     ],
+     "ms_mean": 0.8192491499357857
+    },
+    "CEDCS (freshness off)": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0225,
+     "undertriage_ci": [
+      0.016857786450721658,
+      0.029973060857768196
+     ],
+     "undertriage_avoidable": 0.0225,
+     "undertriage_avoidable_ci": [
+      0.016857786450721658,
+      0.029973060857768196
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.058,
+     "req_coverage": [
+      0.9927666666666667,
+      0.9905166666666666,
+      0.9949666666666667
+     ],
+     "full_coverage": [
+      0.9667464285714287,
+      0.962879761904762,
+      0.9703321428571429
+     ],
+     "excess_min": [
+      4.48385,
+      4.1486,
+      4.80565
+     ],
+     "cost": [
+      0.5071925,
+      0.440875,
+      0.573975
+     ],
+     "ms_mean": 0.8191158000845462
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.169,
+     "undertriage_ci": [
+      0.15321382438914655,
+      0.18605530746239307
+     ],
+     "undertriage_avoidable": 0.169,
+     "undertriage_avoidable_ci": [
+      0.15321382438914655,
+      0.18605530746239307
+     ],
+     "n_avoidable": 2000,
+     "violations": 311,
+     "violation_rate": 0.1555,
+     "overtriage": 0.036,
+     "req_coverage": [
+      0.9375416666666666,
+      0.9301666666666666,
+      0.9446916666666667
+     ],
+     "full_coverage": [
+      0.9350535714285715,
+      0.9293452380952381,
+      0.9406392857142858
+     ],
+     "excess_min": [
+      1.7126,
+      1.5557999999999998,
+      1.8504
+     ],
+     "cost": [
+      1.81163,
+      1.6467925,
+      1.9987925
+     ],
+     "ms_mean": 0.5502942996681668
+    }
+   },
+   "mcnemar_p_on_vs_off": 0.3876953125,
+   "calibration_on": {
+    "HIGH": {
+     "n": 11,
+     "appropriate": 1.0,
+     "ci": [
+      0.7411599827511859,
+      1.0
+     ]
+    },
+    "MODERATE": {
+     "n": 1317,
+     "appropriate": 0.9855732725892179,
+     "ci": [
+      0.9775770459460597,
+      0.990744969350854
+     ]
+    },
+    "LOW": {
+     "n": 672,
+     "appropriate": 0.9553571428571429,
+     "ci": [
+      0.9369850043766266,
+      0.9685526245589111
+     ]
+    }
+   },
+   "calibration_off": {
+    "HIGH": {
+     "n": 1427,
+     "appropriate": 0.98458304134548,
+     "ci": [
+      0.9767668843184829,
+      0.989797129475916
+     ]
+    },
+    "MODERATE": {
+     "n": 573,
+     "appropriate": 0.9598603839441536,
+     "ci": [
+      0.9404893370460289,
+      0.9731063536947223
+     ]
+    },
+    "LOW": {
+     "n": 0,
+     "appropriate": null,
+     "ci": [
+      null,
+      null
+     ]
+    }
+   }
+  },
+  "12.0": {
+   "summary": {
+    "CEDCS (freshness on)": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.056,
+     "undertriage_ci": [
+      0.0467481785557923,
+      0.0669542218734632
+     ],
+     "undertriage_avoidable": 0.056,
+     "undertriage_avoidable_ci": [
+      0.0467481785557923,
+      0.0669542218734632
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.041,
+     "req_coverage": [
+      0.9847250000000001,
+      0.9818583333333334,
+      0.98745
+     ],
+     "full_coverage": [
+      0.9524583333333334,
+      0.9478440476190476,
+      0.9566476190476191
+     ],
+     "excess_min": [
+      4.03955,
+      3.708,
+      4.3618999999999994
+     ],
+     "cost": [
+      0.8029775,
+      0.701135,
+      0.9151975
+     ],
+     "ms_mean": 0.8396432011504658
+    },
+    "CEDCS (freshness off)": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.048,
+     "undertriage_ci": [
+      0.0394667769183416,
+      0.0582662973925221
+     ],
+     "undertriage_avoidable": 0.048,
+     "undertriage_avoidable_ci": [
+      0.0394667769183416,
+      0.0582662973925221
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.046,
+     "req_coverage": [
+      0.986875,
+      0.9839166666666667,
+      0.9894333333333333
+     ],
+     "full_coverage": [
+      0.9594345238095239,
+      0.955222619047619,
+      0.963352380952381
+     ],
+     "excess_min": [
+      5.3942,
+      4.961,
+      5.8054
+     ],
+     "cost": [
+      0.79571,
+      0.7008975000000001,
+      0.898055
+     ],
+     "ms_mean": 0.8204225493827835
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.256,
+     "undertriage_ci": [
+      0.23735336585610178,
+      0.2755821875329485
+     ],
+     "undertriage_avoidable": 0.256,
+     "undertriage_avoidable_ci": [
+      0.23735336585610178,
+      0.2755821875329485
+     ],
+     "n_avoidable": 2000,
+     "violations": 506,
+     "violation_rate": 0.253,
+     "overtriage": 0.0315,
+     "req_coverage": [
+      0.900775,
+      0.8923666666666666,
+      0.9088916666666667
+     ],
+     "full_coverage": [
+      0.9017511904761905,
+      0.8951464285714286,
+      0.9084464285714285
+     ],
+     "excess_min": [
+      1.809,
+      1.67165,
+      1.9607
+     ],
+     "cost": [
+      2.6819499999999996,
+      2.5040675,
+      2.8755100000000002
+     ],
+     "ms_mean": 0.5147297494113445
+    }
+   },
+   "mcnemar_p_on_vs_off": 0.0070003666914999485,
+   "calibration_on": {
+    "HIGH": {
+     "n": 2,
+     "appropriate": 1.0,
+     "ci": [
+      0.34237195288961925,
+      1.0
+     ]
+    },
+    "MODERATE": {
+     "n": 270,
+     "appropriate": 0.9888888888888889,
+     "ci": [
+      0.9678467469452553,
+      0.9962142284507401
+     ]
+    },
+    "LOW": {
+     "n": 1728,
+     "appropriate": 0.9369212962962963,
+     "ci": [
+      0.9244614424789865,
+      0.9474427778607952
+     ]
+    }
+   },
+   "calibration_off": {
+    "HIGH": {
+     "n": 1470,
+     "appropriate": 0.954421768707483,
+     "ci": [
+      0.9425233518483641,
+      0.96395126523396
+     ]
+    },
+    "MODERATE": {
+     "n": 530,
+     "appropriate": 0.9452830188679245,
+     "ci": [
+      0.9225217575034467,
+      0.9616356404962597
+     ]
+    },
+    "LOW": {
+     "n": 0,
+     "appropriate": null,
+     "ci": [
+      null,
+      null
+     ]
+    }
+   }
+  }
+ },
+ "e3": {
+  "0.0": {
+   "summary": {
+    "CEDCS": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0095,
+     "undertriage_ci": [
+      0.006090191210478055,
+      0.014790501155625134
+     ],
+     "undertriage_avoidable": 0.0095,
+     "undertriage_avoidable_ci": [
+      0.006090191210478055,
+      0.014790501155625134
+     ],
+     "n_avoidable": 2000,
+     "violations": 0,
+     "violation_rate": 0.0,
+     "overtriage": 0.0395,
+     "req_coverage": [
+      0.9973416666666667,
+      0.9961,
+      0.9984416666666667
+     ],
+     "full_coverage": [
+      0.9695785714285714,
+      0.9661488095238095,
+      0.9727535714285713
+     ],
+     "excess_min": [
+      3.64335,
+      3.3483,
+      3.9454499999999997
+     ],
+     "cost": [
+      0.3166675,
+      0.275225,
+      0.361605
+     ],
+     "ms_mean": 0.8037871496635489
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.153,
+     "undertriage_ci": [
+      0.13788919052470294,
+      0.16944128909005307
+     ],
+     "undertriage_avoidable": 0.153,
+     "undertriage_avoidable_ci": [
+      0.13788919052470294,
+      0.16944128909005307
+     ],
+     "n_avoidable": 2000,
+     "violations": 281,
+     "violation_rate": 0.1405,
+     "overtriage": 0.0315,
+     "req_coverage": [
+      0.9464416666666667,
+      0.939625,
+      0.953175
+     ],
+     "full_coverage": [
+      0.9469797619047619,
+      0.9420571428571428,
+      0.9518904761904762
+     ],
+     "excess_min": [
+      1.6618,
+      1.525,
+      1.7992000000000001
+     ],
+     "cost": [
+      1.64459,
+      1.4866325,
+      1.790385
+     ],
+     "ms_mean": 0.6135810005362146
+    },
+    "B3 distance + specialty": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1495,
+     "undertriage_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "undertriage_avoidable": 0.1495,
+     "undertriage_avoidable_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "n_avoidable": 2000,
+     "violations": 300,
+     "violation_rate": 0.15,
+     "overtriage": 0.017,
+     "req_coverage": [
+      0.9430083333333333,
+      0.9362166666666667,
+      0.9493833333333334
+     ],
+     "full_coverage": [
+      0.8944642857142857,
+      0.8870916666666667,
+      0.9019047619047619
+     ],
+     "excess_min": [
+      0.77075,
+      0.6674500000000001,
+      0.88015
+     ],
+     "cost": [
+      1.5505375,
+      1.4019774999999999,
+      1.712795
+     ],
+     "ms_mean": 0.0
+    }
+   },
+   "violations_of_given_profile": {
+    "CEDCS": {
+     "count": 0,
+     "of": 2000
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "count": 281,
+     "of": 2000
+    }
+   },
+   "share_corrupted": 0.0,
+   "undertriage_when_corrupted": {
+    "CEDCS": null,
+    "B4 soft ranking, no gate, no freshness": null,
+    "B3 distance + specialty": null
+   }
+  },
+  "0.1": {
+   "summary": {
+    "CEDCS": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0195,
+     "undertriage_ci": [
+      0.014297175281702396,
+      0.02654517473239054
+     ],
+     "undertriage_avoidable": 0.0195,
+     "undertriage_avoidable_ci": [
+      0.014297175281702396,
+      0.02654517473239054
+     ],
+     "n_avoidable": 2000,
+     "violations": 20,
+     "violation_rate": 0.01,
+     "overtriage": 0.0385,
+     "req_coverage": [
+      0.9941333333333333,
+      0.9922583333333334,
+      0.9958583333333334
+     ],
+     "full_coverage": [
+      0.9666904761904761,
+      0.9632654761904762,
+      0.9701642857142857
+     ],
+     "excess_min": [
+      3.4505,
+      3.17325,
+      3.73165
+     ],
+     "cost": [
+      0.406025,
+      0.34557,
+      0.46970249999999997
+     ],
+     "ms_mean": 0.8095918993349187
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1665,
+     "undertriage_ci": [
+      0.15081569348621734,
+      0.18346302395332484
+     ],
+     "undertriage_avoidable": 0.1665,
+     "undertriage_avoidable_ci": [
+      0.15081569348621734,
+      0.18346302395332484
+     ],
+     "n_avoidable": 2000,
+     "violations": 307,
+     "violation_rate": 0.1535,
+     "overtriage": 0.0295,
+     "req_coverage": [
+      0.9401499999999999,
+      0.9332416666666666,
+      0.94735
+     ],
+     "full_coverage": [
+      0.9416142857142857,
+      0.9363119047619047,
+      0.9467476190476191
+     ],
+     "excess_min": [
+      1.5733499999999998,
+      1.44275,
+      1.7097
+     ],
+     "cost": [
+      1.7731675,
+      1.6040675000000002,
+      1.9273099999999999
+     ],
+     "ms_mean": 0.6219152503763326
+    },
+    "B3 distance + specialty": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1495,
+     "undertriage_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "undertriage_avoidable": 0.1495,
+     "undertriage_avoidable_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "n_avoidable": 2000,
+     "violations": 300,
+     "violation_rate": 0.15,
+     "overtriage": 0.017,
+     "req_coverage": [
+      0.9430083333333333,
+      0.9362166666666667,
+      0.9493833333333334
+     ],
+     "full_coverage": [
+      0.8944642857142857,
+      0.8870916666666667,
+      0.9019047619047619
+     ],
+     "excess_min": [
+      0.77075,
+      0.6674500000000001,
+      0.88015
+     ],
+     "cost": [
+      1.5505375,
+      1.4019774999999999,
+      1.712795
+     ],
+     "ms_mean": 0.0
+    }
+   },
+   "violations_of_given_profile": {
+    "CEDCS": {
+     "count": 0,
+     "of": 2000
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "count": 288,
+     "of": 2000
+    }
+   },
+   "share_corrupted": 0.0975,
+   "undertriage_when_corrupted": {
+    "CEDCS": 0.11282051282051282,
+    "B4 soft ranking, no gate, no freshness": 0.30256410256410254,
+    "B3 distance + specialty": 0.13846153846153847
+   }
+  },
+  "0.2": {
+   "summary": {
+    "CEDCS": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.0365,
+     "undertriage_ci": [
+      0.029129631650884488,
+      0.045647536364791005
+     ],
+     "undertriage_avoidable": 0.0365,
+     "undertriage_avoidable_ci": [
+      0.029129631650884488,
+      0.045647536364791005
+     ],
+     "n_avoidable": 2000,
+     "violations": 50,
+     "violation_rate": 0.025,
+     "overtriage": 0.0375,
+     "req_coverage": [
+      0.9893083333333332,
+      0.9868166666666667,
+      0.991775
+     ],
+     "full_coverage": [
+      0.9610238095238095,
+      0.9570059523809524,
+      0.964675
+     ],
+     "excess_min": [
+      3.17075,
+      2.8989499999999997,
+      3.4529
+     ],
+     "cost": [
+      0.5610375000000001,
+      0.4812225,
+      0.644355
+     ],
+     "ms_mean": 0.7732793999020942
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.182,
+     "undertriage_ci": [
+      0.16570448249960917,
+      0.19951480429431706
+     ],
+     "undertriage_avoidable": 0.182,
+     "undertriage_avoidable_ci": [
+      0.16570448249960917,
+      0.19951480429431706
+     ],
+     "n_avoidable": 2000,
+     "violations": 332,
+     "violation_rate": 0.166,
+     "overtriage": 0.0305,
+     "req_coverage": [
+      0.9338916666666667,
+      0.9265249999999999,
+      0.9409833333333334
+     ],
+     "full_coverage": [
+      0.936254761904762,
+      0.9307880952380952,
+      0.9415571428571429
+     ],
+     "excess_min": [
+      1.5034,
+      1.3756,
+      1.63595
+     ],
+     "cost": [
+      1.92567,
+      1.75227,
+      2.0870025
+     ],
+     "ms_mean": 0.6064286498003639
+    },
+    "B3 distance + specialty": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1495,
+     "undertriage_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "undertriage_avoidable": 0.1495,
+     "undertriage_avoidable_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "n_avoidable": 2000,
+     "violations": 300,
+     "violation_rate": 0.15,
+     "overtriage": 0.017,
+     "req_coverage": [
+      0.9430083333333333,
+      0.9362166666666667,
+      0.9493833333333334
+     ],
+     "full_coverage": [
+      0.8944642857142857,
+      0.8870916666666667,
+      0.9019047619047619
+     ],
+     "excess_min": [
+      0.77075,
+      0.6674500000000001,
+      0.88015
+     ],
+     "cost": [
+      1.5505375,
+      1.4019774999999999,
+      1.712795
+     ],
+     "ms_mean": 0.0
+    }
+   },
+   "violations_of_given_profile": {
+    "CEDCS": {
+     "count": 0,
+     "of": 2000
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "count": 286,
+     "of": 2000
+    }
+   },
+   "share_corrupted": 0.204,
+   "undertriage_when_corrupted": {
+    "CEDCS": 0.13970588235294118,
+    "B4 soft ranking, no gate, no freshness": 0.29411764705882354,
+    "B3 distance + specialty": 0.15441176470588236
+   }
+  },
+  "0.3": {
+   "summary": {
+    "CEDCS": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.04,
+     "undertriage_ci": [
+      0.03225661944600628,
+      0.04950712874646563
+     ],
+     "undertriage_avoidable": 0.04,
+     "undertriage_avoidable_ci": [
+      0.03225661944600628,
+      0.04950712874646563
+     ],
+     "n_avoidable": 2000,
+     "violations": 60,
+     "violation_rate": 0.03,
+     "overtriage": 0.0375,
+     "req_coverage": [
+      0.9882416666666667,
+      0.9856083333333333,
+      0.9907166666666667
+     ],
+     "full_coverage": [
+      0.9607785714285715,
+      0.9564785714285714,
+      0.9645214285714286
+     ],
+     "excess_min": [
+      3.1521,
+      2.8941,
+      3.4297
+     ],
+     "cost": [
+      0.595105,
+      0.5133925,
+      0.6825375
+     ],
+     "ms_mean": 0.7579048499464989
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1905,
+     "undertriage_ci": [
+      0.17388897962581215,
+      0.20829771616890538
+     ],
+     "undertriage_avoidable": 0.1905,
+     "undertriage_avoidable_ci": [
+      0.17388897962581215,
+      0.20829771616890538
+     ],
+     "n_avoidable": 2000,
+     "violations": 352,
+     "violation_rate": 0.176,
+     "overtriage": 0.028,
+     "req_coverage": [
+      0.929775,
+      0.9218083333333332,
+      0.9374166666666667
+     ],
+     "full_coverage": [
+      0.9327654761904762,
+      0.9272738095238096,
+      0.938332142857143
+     ],
+     "excess_min": [
+      1.3937,
+      1.2724000000000002,
+      1.5276500000000002
+     ],
+     "cost": [
+      2.002685,
+      1.8282,
+      2.1769225000000003
+     ],
+     "ms_mean": 0.5819812505505979
+    },
+    "B3 distance + specialty": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1495,
+     "undertriage_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "undertriage_avoidable": 0.1495,
+     "undertriage_avoidable_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "n_avoidable": 2000,
+     "violations": 300,
+     "violation_rate": 0.15,
+     "overtriage": 0.017,
+     "req_coverage": [
+      0.9430083333333333,
+      0.9362166666666667,
+      0.9493833333333334
+     ],
+     "full_coverage": [
+      0.8944642857142857,
+      0.8870916666666667,
+      0.9019047619047619
+     ],
+     "excess_min": [
+      0.77075,
+      0.6674500000000001,
+      0.88015
+     ],
+     "cost": [
+      1.5505375,
+      1.4019774999999999,
+      1.712795
+     ],
+     "ms_mean": 0.0
+    }
+   },
+   "violations_of_given_profile": {
+    "CEDCS": {
+     "count": 0,
+     "of": 2000
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "count": 297,
+     "of": 2000
+    }
+   },
+   "share_corrupted": 0.299,
+   "undertriage_when_corrupted": {
+    "CEDCS": 0.11204013377926421,
+    "B4 soft ranking, no gate, no freshness": 0.25418060200668896,
+    "B3 distance + specialty": 0.14046822742474915
+   }
+  },
+  "0.5": {
+   "summary": {
+    "CEDCS": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.06,
+     "undertriage_ci": [
+      0.050411035471882915,
+      0.07127602801656847
+     ],
+     "undertriage_avoidable": 0.06,
+     "undertriage_avoidable_ci": [
+      0.050411035471882915,
+      0.07127602801656847
+     ],
+     "n_avoidable": 2000,
+     "violations": 105,
+     "violation_rate": 0.0525,
+     "overtriage": 0.035,
+     "req_coverage": [
+      0.9825833333333334,
+      0.9795750000000001,
+      0.9855916666666666
+     ],
+     "full_coverage": [
+      0.9547238095238095,
+      0.9503333333333334,
+      0.9589107142857143
+     ],
+     "excess_min": [
+      2.73415,
+      2.4975500000000004,
+      2.9718
+     ],
+     "cost": [
+      0.7717075,
+      0.6681475,
+      0.8743825000000001
+     ],
+     "ms_mean": 0.7974385998095386
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.207,
+     "undertriage_ci": [
+      0.18981312972466233,
+      0.22531030118923825
+     ],
+     "undertriage_avoidable": 0.207,
+     "undertriage_avoidable_ci": [
+      0.18981312972466233,
+      0.22531030118923825
+     ],
+     "n_avoidable": 2000,
+     "violations": 385,
+     "violation_rate": 0.1925,
+     "overtriage": 0.0285,
+     "req_coverage": [
+      0.922025,
+      0.9139833333333334,
+      0.9298166666666667
+     ],
+     "full_coverage": [
+      0.9277726190476191,
+      0.9218547619047619,
+      0.9331142857142858
+     ],
+     "excess_min": [
+      1.333,
+      1.21595,
+      1.46425
+     ],
+     "cost": [
+      2.16515,
+      1.989885,
+      2.3510225
+     ],
+     "ms_mean": 0.6352834007702768
+    },
+    "B3 distance + specialty": {
+     "n": 2000,
+     "issued": 2000,
+     "handoff_rate": 0.0,
+     "undertriage": 0.1495,
+     "undertriage_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "undertriage_avoidable": 0.1495,
+     "undertriage_avoidable_ci": [
+      0.13454464860680254,
+      0.16579925083115704
+     ],
+     "n_avoidable": 2000,
+     "violations": 300,
+     "violation_rate": 0.15,
+     "overtriage": 0.017,
+     "req_coverage": [
+      0.9430083333333333,
+      0.9362166666666667,
+      0.9493833333333334
+     ],
+     "full_coverage": [
+      0.8944642857142857,
+      0.8870916666666667,
+      0.9019047619047619
+     ],
+     "excess_min": [
+      0.77075,
+      0.6674500000000001,
+      0.88015
+     ],
+     "cost": [
+      1.5505375,
+      1.4019774999999999,
+      1.712795
+     ],
+     "ms_mean": 0.0
+    }
+   },
+   "violations_of_given_profile": {
+    "CEDCS": {
+     "count": 0,
+     "of": 2000
+    },
+    "B4 soft ranking, no gate, no freshness": {
+     "count": 291,
+     "of": 2000
+    }
+   },
+   "share_corrupted": 0.4665,
+   "undertriage_when_corrupted": {
+    "CEDCS": 0.11789924973204716,
+    "B4 soft ranking, no gate, no freshness": 0.2872454448017149,
+    "B3 distance + specialty": 0.14255091103965703
+   }
+  }
+ },
+ "e4": {
+  "0": {
+   "summary": {
+    "n": 2000,
+    "issued": 2000,
+    "handoff_rate": 0.0,
+    "undertriage": 0.177,
+    "undertriage_ci": [
+     0.16089643368871986,
+     0.1943420242812115
+    ],
+    "undertriage_avoidable": 0.177,
+    "undertriage_avoidable_ci": [
+     0.16089643368871986,
+     0.1943420242812115
+    ],
+    "n_avoidable": 2000,
+    "violations": 323,
+    "violation_rate": 0.1615,
+    "overtriage": 0.0645,
+    "req_coverage": [
+     0.93545,
+     0.9284666666666667,
+     0.9418666666666666
+    ],
+    "full_coverage": [
+     0.9084,
+     0.901345238095238,
+     0.9152214285714285
+    ],
+    "excess_min": [
+     1.514,
+     1.382,
+     1.6571500000000001
+    ],
+    "cost": [
+     1.9102000000000001,
+     1.73842,
+     2.075085
+    ],
+    "ms_mean": 0.6694288019207306
+   },
+   "required_recall_mean": 0.471175,
+   "priority_underestimated": 0.469,
+   "n": 2000,
+   "calibration": {
+    "HIGH": {
+     "n": 283,
+     "appropriate": 0.7985865724381626,
+     "ci": [
+      0.748002661750706,
+      0.8411726879893596
+     ]
+    },
+    "MODERATE": {
+     "n": 1616,
+     "appropriate": 0.8273514851485149,
+     "ci": [
+      0.8081533340398506,
+      0.8449969492964955
+     ]
+    },
+    "LOW": {
+     "n": 101,
+     "appropriate": 0.8217821782178217,
+     "ci": [
+      0.7357926525531545,
+      0.8841902549949942
+     ]
+    }
+   }
+  },
+  "1": {
+   "summary": {
+    "n": 2000,
+    "issued": 2000,
+    "handoff_rate": 0.0,
+    "undertriage": 0.2315,
+    "undertriage_ci": [
+     0.2135394912110507,
+     0.2504900009404248
+    ],
+    "undertriage_avoidable": 0.2315,
+    "undertriage_avoidable_ci": [
+     0.2135394912110507,
+     0.2504900009404248
+    ],
+    "n_avoidable": 2000,
+    "violations": 428,
+    "violation_rate": 0.214,
+    "overtriage": 0.051,
+    "req_coverage": [
+     0.9115416666666666,
+     0.9035583333333332,
+     0.91935
+    ],
+    "full_coverage": [
+     0.8830833333333333,
+     0.8750285714285715,
+     0.8908714285714286
+    ],
+    "excess_min": [
+     1.43685,
+     1.30755,
+     1.5874000000000001
+    ],
+    "cost": [
+     2.4378425000000004,
+     2.2508025,
+     2.624965
+    ],
+    "ms_mean": 0.6314076030394062
+   },
+   "required_recall_mean": 0.458925,
+   "priority_underestimated": 0.579,
+   "n": 2000,
+   "calibration": {
+    "HIGH": {
+     "n": 213,
+     "appropriate": 0.784037558685446,
+     "ci": [
+      0.7240048806294016,
+      0.8340061283282892
+     ]
+    },
+    "MODERATE": {
+     "n": 1612,
+     "appropriate": 0.7766749379652605,
+     "ci": [
+      0.755699536792432,
+      0.7963347715209572
+     ]
+    },
+    "LOW": {
+     "n": 175,
+     "appropriate": 0.6742857142857143,
+     "ci": [
+      0.6017549806499897,
+      0.739328972971539
+     ]
+    }
+   }
+  },
+  "2": {
+   "summary": {
+    "n": 2000,
+    "issued": 2000,
+    "handoff_rate": 0.0,
+    "undertriage": 0.258,
+    "undertriage_ci": [
+     0.23930094249644365,
+     0.27762694242220465
+    ],
+    "undertriage_avoidable": 0.258,
+    "undertriage_avoidable_ci": [
+     0.23930094249644365,
+     0.27762694242220465
+    ],
+    "n_avoidable": 2000,
+    "violations": 474,
+    "violation_rate": 0.237,
+    "overtriage": 0.0705,
+    "req_coverage": [
+     0.8997666666666666,
+     0.89155,
+     0.9080750000000001
+    ],
+    "full_coverage": [
+     0.8792678571428572,
+     0.8715547619047619,
+     0.8870583333333333
+    ],
+    "excess_min": [
+     1.8228,
+     1.65875,
+     2.0017
+    ],
+    "cost": [
+     2.74164,
+     2.541925,
+     2.9392225
+    ],
+    "ms_mean": 0.6059167991625145
+   },
+   "required_recall_mean": 0.4393,
+   "priority_underestimated": 0.5325,
+   "n": 2000,
+   "calibration": {
+    "HIGH": {
+     "n": 228,
+     "appropriate": 0.75,
+     "ci": [
+      0.689964558224925,
+      0.8017504747976214
+     ]
+    },
+    "MODERATE": {
+     "n": 1622,
+     "appropriate": 0.750924784217016,
+     "ci": [
+      0.7293012207501329,
+      0.7713625585503844
+     ]
+    },
+    "LOW": {
+     "n": 150,
+     "appropriate": 0.6333333333333333,
+     "ci": [
+      0.5537808929385404,
+      0.706226803289268
+     ]
+    }
+   }
+  },
+  "3": {
+   "summary": {
+    "n": 2000,
+    "issued": 2000,
+    "handoff_rate": 0.0,
+    "undertriage": 0.28,
+    "undertriage_ci": [
+     0.26075787015650537,
+     0.3000856615877204
+    ],
+    "undertriage_avoidable": 0.28,
+    "undertriage_avoidable_ci": [
+     0.26075787015650537,
+     0.3000856615877204
+    ],
+    "n_avoidable": 2000,
+    "violations": 520,
+    "violation_rate": 0.26,
+    "overtriage": 0.0675,
+    "req_coverage": [
+     0.885525,
+     0.876075,
+     0.89425
+    ],
+    "full_coverage": [
+     0.8641416666666667,
+     0.8553095238095239,
+     0.8726392857142857
+    ],
+    "excess_min": [
+     1.51535,
+     1.3952,
+     1.6509
+    ],
+    "cost": [
+     2.9432675,
+     2.7466425,
+     3.13806
+    ],
+    "ms_mean": 0.6444209501496516
+   },
+   "required_recall_mean": 0.4265,
+   "priority_underestimated": 0.559,
+   "n": 2000,
+   "calibration": {
+    "HIGH": {
+     "n": 235,
+     "appropriate": 0.7617021276595745,
+     "ci": [
+      0.7032967841223545,
+      0.8116888800165558
+     ]
+    },
+    "MODERATE": {
+     "n": 1608,
+     "appropriate": 0.7269900497512438,
+     "ci": [
+      0.70469286898764,
+      0.7482052321657241
+     ]
+    },
+    "LOW": {
+     "n": 157,
+     "appropriate": 0.5859872611464968,
+     "ci": [
+      0.5077842254873417,
+      0.6600827939902063
+     ]
+    }
+   }
+  }
+ },
+ "e5": {
+  "baseline_undertriage": 0.0095,
+  "draws": 20,
+  "spread": 0.2,
+  "undertriage_min": 0.0085,
+  "undertriage_max": 0.01,
+  "undertriage_mean": 0.009174999999999999,
+  "top1_agreement_min": 0.935,
+  "top1_agreement_mean": 0.9624499999999999,
+  "top1_agreement_max": 0.9785,
+  "per_draw": [
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.9695,
+    "excess_min": 3.3879
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.961,
+    "excess_min": 3.5356
+   },
+   {
+    "undertriage": 0.0095,
+    "top1_agreement": 0.97,
+    "excess_min": 3.76255
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.9585,
+    "excess_min": 3.35115
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.974,
+    "excess_min": 3.58865
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.96,
+    "excess_min": 3.49585
+   },
+   {
+    "undertriage": 0.01,
+    "top1_agreement": 0.955,
+    "excess_min": 3.7989499999999996
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.9585,
+    "excess_min": 3.7411
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.967,
+    "excess_min": 3.6889000000000003
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.976,
+    "excess_min": 3.58595
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.961,
+    "excess_min": 3.6825
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.952,
+    "excess_min": 3.2011999999999996
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.968,
+    "excess_min": 3.62065
+   },
+   {
+    "undertriage": 0.009,
+    "top1_agreement": 0.968,
+    "excess_min": 3.53965
+   },
+   {
+    "undertriage": 0.0095,
+    "top1_agreement": 0.972,
+    "excess_min": 3.784
+   },
+   {
+    "undertriage": 0.0085,
+    "top1_agreement": 0.9575,
+    "excess_min": 3.3983000000000003
+   },
+   {
+    "undertriage": 0.0095,
+    "top1_agreement": 0.9785,
+    "excess_min": 3.6740999999999997
+   },
+   {
+    "undertriage": 0.01,
+    "top1_agreement": 0.9455,
+    "excess_min": 3.67165
+   },
+   {
+    "undertriage": 0.0085,
+    "top1_agreement": 0.962,
+    "excess_min": 3.7740500000000003
+   },
+   {
+    "undertriage": 0.01,
+    "top1_agreement": 0.935,
+    "excess_min": 3.69175
+   }
+  ]
+ },
+ "e6": {
+  "0.0": {
+   "n": 2000,
+   "handoff_rate": 0.0,
+   "widened_rate": 0.128,
+   "recommended_rate": 1.0,
+   "undertriage": 0.0095,
+   "violations": 0,
+   "avoidable_share": 1.0,
+   "handoff_when_avoidable": 0.0,
+   "handoff_when_unavoidable": 0.0,
+   "rungs": {
+    "widened": 256,
+    "none": 1744
+   }
+  },
+  "0.2": {
+   "n": 2000,
+   "handoff_rate": 0.0,
+   "widened_rate": 0.252,
+   "recommended_rate": 1.0,
+   "undertriage": 0.0095,
+   "violations": 0,
+   "avoidable_share": 1.0,
+   "handoff_when_avoidable": 0.0,
+   "handoff_when_unavoidable": 0.0,
+   "rungs": {
+    "widened": 504,
+    "none": 1496
+   }
+  },
+  "0.4": {
+   "n": 2000,
+   "handoff_rate": 0.0045,
+   "widened_rate": 0.3555,
+   "recommended_rate": 0.9955,
+   "undertriage": 0.01607232546459066,
+   "violations": 0,
+   "avoidable_share": 0.9955,
+   "handoff_when_avoidable": 0.0,
+   "handoff_when_unavoidable": 1.0,
+   "rungs": {
+    "widened": 711,
+    "none": 1280,
+    "handoff": 9
+   }
+  },
+  "0.6": {
+   "n": 2000,
+   "handoff_rate": 0.013,
+   "widened_rate": 0.4255,
+   "recommended_rate": 0.987,
+   "undertriage": 0.14893617021276595,
+   "violations": 0,
+   "avoidable_share": 0.874,
+   "handoff_when_avoidable": 0.0,
+   "handoff_when_unavoidable": 0.10317460317460317,
+   "rungs": {
+    "widened": 851,
+    "none": 1123,
+    "handoff": 26
+   }
+  },
+  "0.8": {
+   "n": 2000,
+   "handoff_rate": 0.186,
+   "widened_rate": 0.292,
+   "recommended_rate": 0.814,
+   "undertriage": 0.14373464373464373,
+   "violations": 0,
+   "avoidable_share": 0.716,
+   "handoff_when_avoidable": 0.0,
+   "handoff_when_unavoidable": 0.6549295774647887,
+   "rungs": {
+    "handoff": 372,
+    "none": 1044,
+    "widened": 584
+   }
+  },
+  "0.95": {
+   "n": 2000,
+   "handoff_rate": 0.3165,
+   "widened_rate": 0.175,
+   "recommended_rate": 0.6835,
+   "undertriage": 0.1485003657644477,
+   "violations": 0,
+   "avoidable_share": 0.589,
+   "handoff_when_avoidable": 0.0,
+   "handoff_when_unavoidable": 0.7700729927007299,
+   "rungs": {
+    "handoff": 633,
+    "none": 1017,
+    "widened": 350
+   }
+  }
+ },
+ "latency_core": {
+  "n": 2000,
+  "mean_ms": 0.7320391995599493,
+  "p50_ms": 0.4770000232383609,
+  "p95_ms": 1.8810000037774444,
+  "max_ms": 21.932699950411916
+ },
+ "b5": {
+  "n": 60,
+  "errors": 0,
+  "B5": {
+   "n": 60,
+   "issued": 60,
+   "handoff_rate": 0.0,
+   "undertriage": 0.3,
+   "undertriage_ci": [
+    0.19898010252726892,
+    0.42508946966390415
+   ],
+   "undertriage_avoidable": 0.3,
+   "undertriage_avoidable_ci": [
+    0.19898010252726892,
+    0.42508946966390415
+   ],
+   "n_avoidable": 60,
+   "violations": 15,
+   "violation_rate": 0.25,
+   "overtriage": 0.016666666666666666,
+   "req_coverage": [
+    0.8833333333333333,
+    0.8236111111111111,
+    0.9341666666666666
+   ],
+   "full_coverage": [
+    0.8818650793650794,
+    0.8438095238095238,
+    0.9191269841269841
+   ],
+   "excess_min": [
+    0.9666666666666667,
+    0.38833333333333336,
+    1.6816666666666669
+   ],
+   "cost": [
+    3.065,
+    1.9403333333333335,
+    4.23625
+   ],
+   "ms_mean": 3908.0285533331335
+  },
+  "same_cases": {
+   "CEDCS": {
+    "n": 60,
+    "issued": 60,
+    "handoff_rate": 0.0,
+    "undertriage": 0.0,
+    "undertriage_ci": [
+     0.0,
+     0.06017393047793289
+    ],
+    "undertriage_avoidable": 0.0,
+    "undertriage_avoidable_ci": [
+     0.0,
+     0.06017393047793289
+    ],
+    "n_avoidable": 60,
+    "violations": 0,
+    "violation_rate": 0.0,
+    "overtriage": 0.03333333333333333,
+    "req_coverage": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "full_coverage": [
+     0.966547619047619,
+     0.9465476190476191,
+     0.9853571428571429
+    ],
+    "excess_min": [
+     5.748333333333333,
+     3.2849999999999997,
+     8.768333333333334
+    ],
+    "cost": [
+     0.32075000000000004,
+     0.18675,
+     0.48675
+    ],
+    "ms_mean": 5.464261677116156
+   },
+   "B4 soft ranking, no gate, no freshness": {
+    "n": 60,
+    "issued": 60,
+    "handoff_rate": 0.0,
+    "undertriage": 0.18333333333333332,
+    "undertriage_ci": [
+     0.1055768903713613,
+     0.29919993226466285
+    ],
+    "undertriage_avoidable": 0.18333333333333332,
+    "undertriage_avoidable_ci": [
+     0.1055768903713613,
+     0.29919993226466285
+    ],
+    "n_avoidable": 60,
+    "violations": 12,
+    "violation_rate": 0.2,
+    "overtriage": 0.06666666666666667,
+    "req_coverage": [
+     0.9280555555555555,
+     0.8747222222222223,
+     0.9711111111111111
+    ],
+    "full_coverage": [
+     0.935952380952381,
+     0.9061904761904762,
+     0.9633333333333333
+    ],
+    "excess_min": [
+     1.645,
+     0.8966666666666665,
+     2.5416666666666665
+    ],
+    "cost": [
+     1.98225,
+     1.0136666666666667,
+     3.0221666666666667
+    ],
+    "ms_mean": 2.9513716736497977
+   }
+  }
+ },
+ "latency_real": {
+  "window": {
+   "since": null,
+   "runs": 47,
+   "first": 1791440263.734941,
+   "last": 1792164804.4122012
+  },
+  "latency": {
+   "total": {
+    "n": 45,
+    "mean": 37281.6,
+    "p50": 24481.9,
+    "p95": 104761.2,
+    "min": 7539.2,
+    "max": 249003.7
+   },
+   "stages": [
+    {
+     "stage": "PIPELINE",
+     "depth": 0,
+     "n": 45,
+     "mean": 37281.6,
+     "p50": 24481.9,
+     "p95": 104761.2,
+     "min": 7539.2,
+     "max": 249003.7
+    },
+    {
+     "stage": "FRONT_CREW",
+     "depth": 1,
+     "n": 45,
+     "mean": 33853.3,
+     "p50": 21977.3,
+     "p95": 97124.5,
+     "min": 5114.3,
+     "max": 242963.7
+    },
+    {
+     "stage": "EXPLANATION",
+     "depth": 1,
+     "n": 45,
+     "mean": 1562.9,
+     "p50": 1333.0,
+     "p95": 3601.2,
+     "min": 650.6,
+     "max": 4922.5
+    },
+    {
+     "stage": "DETERMINISTIC_CORE",
+     "depth": 1,
+     "n": 45,
+     "mean": 1706.2,
+     "p50": 1137.7,
+     "p95": 2861.1,
+     "min": 592.5,
+     "max": 19980.2
+    },
+    {
+     "stage": "RED_FLAGS",
+     "depth": 1,
+     "n": 45,
+     "mean": 0.1,
+     "p50": 0.1,
+     "p95": 0.3,
+     "min": 0.0,
+     "max": 0.5
+    },
+    {
+     "stage": "VALIDATION_GATE",
+     "depth": 1,
+     "n": 45,
+     "mean": 0.2,
+     "p50": 0.1,
+     "p95": 0.4,
+     "min": 0.0,
+     "max": 1.7
+    },
+    {
+     "stage": "RESOURCE_INTERPRETATION",
+     "depth": 2,
+     "n": 45,
+     "mean": 18499.6,
+     "p50": 10954.3,
+     "p95": 60417.2,
+     "min": 0.4,
+     "max": 199026.5
+    },
+    {
+     "stage": "FACILITY_DISCOVERY",
+     "depth": 2,
+     "n": 45,
+     "mean": 8768.4,
+     "p50": 4893.3,
+     "p95": 36637.2,
+     "min": 5.2,
+     "max": 40366.1
+    },
+    {
+     "stage": "CRITIC",
+     "depth": 2,
+     "n": 45,
+     "mean": 4136.6,
+     "p50": 3426.1,
+     "p95": 9003.6,
+     "min": 1416.0,
+     "max": 13983.2
+    },
+    {
+     "stage": "INTAKE",
+     "depth": 2,
+     "n": 45,
+     "mean": 4241.3,
+     "p50": 3208.5,
+     "p95": 16831.4,
+     "min": 414.9,
+     "max": 19878.6
+    },
+    {
+     "stage": "CLARIFICATION",
+     "depth": 2,
+     "n": 45,
+     "mean": 2740.8,
+     "p50": 2459.8,
+     "p95": 8576.2,
+     "min": 378.9,
+     "max": 11169.6
+    },
+    {
+     "stage": "TRIAGE",
+     "depth": 2,
+     "n": 45,
+     "mean": 1440.8,
+     "p50": 1215.2,
+     "p95": 3325.6,
+     "min": 671.7,
+     "max": 3742.3
+    },
+    {
+     "stage": "ADVISOR",
+     "depth": 2,
+     "n": 45,
+     "mean": 1695.5,
+     "p50": 1127.0,
+     "p95": 2849.8,
+     "min": 584.8,
+     "max": 19977.4
+    },
+    {
+     "stage": "ETA_ROUTING",
+     "depth": 2,
+     "n": 45,
+     "mean": 450.3,
+     "p50": 241.1,
+     "p95": 1687.7,
+     "min": 0.1,
+     "max": 2119.9
+    },
+    {
+     "stage": "RE_RANK",
+     "depth": 2,
+     "n": 13,
+     "mean": 1.7,
+     "p50": 1.3,
+     "p95": 4.0,
+     "min": 0.4,
+     "max": 5.3
+    },
+    {
+     "stage": "ELIGIBILITY",
+     "depth": 2,
+     "n": 45,
+     "mean": 1.1,
+     "p50": 0.8,
+     "p95": 2.3,
+     "min": 0.2,
+     "max": 3.7
+    },
+    {
+     "stage": "RANKING",
+     "depth": 2,
+     "n": 45,
+     "mean": 1.2,
+     "p50": 0.8,
+     "p95": 2.9,
+     "min": 0.3,
+     "max": 7.8
+    },
+    {
+     "stage": "ENGINE",
+     "depth": 2,
+     "n": 45,
+     "mean": 1.0,
+     "p50": 0.7,
+     "p95": 2.3,
+     "min": 0.2,
+     "max": 3.8
+    },
+    {
+     "stage": "BED_CHECK",
+     "depth": 2,
+     "n": 9,
+     "mean": 0.8,
+     "p50": 0.7,
+     "p95": 1.5,
+     "min": 0.2,
+     "max": 1.6
+    },
+    {
+     "stage": "REQUIREMENTS",
+     "depth": 2,
+     "n": 45,
+     "mean": 2.1,
+     "p50": 0.1,
+     "p95": 0.3,
+     "min": 0.0,
+     "max": 89.2
+    },
+    {
+     "stage": "FRESHNESS",
+     "depth": 2,
+     "n": 45,
+     "mean": 0.1,
+     "p50": 0.1,
+     "p95": 0.3,
+     "min": 0.0,
+     "max": 0.7
+    },
+    {
+     "stage": "ESCALATION",
+     "depth": 2,
+     "n": 45,
+     "mean": 0.1,
+     "p50": 0.1,
+     "p95": 0.4,
+     "min": 0.0,
+     "max": 0.5
+    }
+   ],
+   "histogram": {
+    "bins": [
+     {
+      "lo": 7539,
+      "hi": 31686,
+      "count": 29
+     },
+     {
+      "lo": 31686,
+      "hi": 55832,
+      "count": 11
+     },
+     {
+      "lo": 55832,
+      "hi": 79979,
+      "count": 2
+     },
+     {
+      "lo": 79979,
+      "hi": 104125,
+      "count": 0
+     },
+     {
+      "lo": 104125,
+      "hi": 128271,
+      "count": 2
+     },
+     {
+      "lo": 128271,
+      "hi": 152418,
+      "count": 0
+     },
+     {
+      "lo": 152418,
+      "hi": 176564,
+      "count": 0
+     },
+     {
+      "lo": 176564,
+      "hi": 200711,
+      "count": 0
+     },
+     {
+      "lo": 200711,
+      "hi": 224857,
+      "count": 0
+     },
+     {
+      "lo": 224857,
+      "hi": 249004,
+      "count": 1
+     }
+    ]
+   }
+  },
+  "ai": {
+   "calls": 282,
+   "fallbacks": 6,
+   "ok_rate": 0.9787,
+   "runs_fully_ai": 41,
+   "providers": {
+    "nvidia": {
+     "calls": 141,
+     "tokens": 174190,
+     "latency_ms": {
+      "n": 141,
+      "mean": 3623.7,
+      "p50": 2674.1,
+      "p95": 9173.3,
+      "min": 373.9,
+      "max": 19977.1
+     }
+    },
+    "groq": {
+     "calls": 135,
+     "tokens": 222019,
+     "latency_ms": {
+      "n": 135,
+      "mean": 1458.5,
+      "p50": 1214.9,
+      "p95": 2924.8,
+      "min": 584.3,
+      "max": 13982.5
+     }
+    }
+   },
+   "by_stage": {
+    "ADVISOR": {
+     "groq": 46,
+     "nvidia": 1
+    },
+    "CLARIFICATION": {
+     "nvidia": 47
+    },
+    "CRITIC": {
+     "nvidia": 44,
+     "groq": 1,
+     "fallback": 2
+    },
+    "EXPLANATION": {
+     "groq": 43,
+     "fallback": 4
+    },
+    "INTAKE": {
+     "nvidia": 47
+    },
+    "TRIAGE": {
+     "groq": 45,
+     "nvidia": 2
+    }
+   }
+  }
+ }
+}
